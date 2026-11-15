@@ -1,0 +1,88 @@
+<% item = @item || local_assigns[:item] %>
+<% inventory = item.inventory %>
+<% item_fields = @fields || inventory.fields %>
+<% content_for :title, "#{item.custom_id} · #{inventory.title} · Stockroom" %>
+
+<header class="page-header">
+  <div class="page-header__copy">
+    <a class="table-link" href="<%= inventory_path(inventory) %>"><%= t("common.back_to_inventory", default: "← Back to %{inventory}", inventory: inventory.title) %></a>
+    <h1><span class="item-id"><%= item.custom_id %></span></h1>
+    <p><%= t("items.added_on", default: "Added %{date}", date: item.created_at&.strftime("%B %-d, %Y at %H:%M")) %><%= t("items.added_by", default: " by %{name}", name: item.created_by&.display_name) if item.respond_to?(:created_by) && item.created_by %></p>
+  </div>
+  <div class="toolbar__group">
+    <% if can_like?(item) %>
+      <% liked = item.liked_by?(current_user) %>
+      <%= button_to item_like_path(item), method: (liked ? :delete : :post), class: "button #{liked ? 'button--secondary' : 'button--primary'}", form: { class: "d-inline-block" } do %>
+        <span aria-hidden="true"><%= liked ? "♥" : "♡" %></span>
+        <span><%= liked ? t("items.unlike", default: "Unlike") : t("items.like", default: "Like") %> · <%= pluralize(item.likes_count.to_i, t("common.like_count", default: "like"), plural: t("common.like_count_plural", default: "likes")) %></span>
+      <% end %>
+    <% else %>
+      <span class="status-pill status-pill--private"><span aria-hidden="true">♡</span> <%= pluralize(item.likes_count.to_i, t("common.like_count", default: "like"), plural: t("common.like_count_plural", default: "likes")) %></span>
+    <% end %>
+    <% if can_edit_item?(item) %>
+      <a class="button button--primary" href="<%= edit_item_path(item) %>"><%= t("items.edit", default: "Edit item") %></a>
+      <%= button_to t("items.delete", default: "Delete item"), item_path(item), method: :delete, class: "button button--danger", form: { data: { confirm: t("items.delete_confirmation", default: "Delete this item permanently? This cannot be undone.") } } %>
+    <% end %>
+  </div>
+</header>
+
+<div class="inventory-content-grid">
+  <section class="panel" aria-labelledby="item-details-heading">
+    <header class="panel__header">
+      <div>
+        <h2 id="item-details-heading"><%= t("items.details_heading", default: "Details") %></h2>
+        <p class="section-copy"><%= t("items.details_description", default: "Values collected by this inventory’s custom fields.") %></p>
+      </div>
+    </header>
+    <% if item_fields.any? %>
+      <div class="table-wrap">
+        <table class="data-table">
+          <caption class="sr-only"><%= t("items.values_caption", default: "Custom field values for %{id}", id: item.custom_id) %></caption>
+          <thead><tr><th scope="col"><%= t("common.field", default: "Field") %></th><th scope="col"><%= t("common.value", default: "Value") %></th></tr></thead>
+          <tbody>
+            <% item_fields.sort_by(&:position).each do |field| %>
+              <% value = item.value_for(field) %>
+              <tr>
+                <th scope="row">
+                  <span class="table-primary"><%= field.title %></span>
+                  <% if field.description.present? %><span class="table-secondary"><%= field.description %></span><% end %>
+                </th>
+                <td>
+                  <% if field.field_type == "document" && value.present? %>
+                    <a class="table-link" href="<%= value %>" target="_blank" rel="noopener noreferrer"><%= t("items.open_document", default: "Open document") %> <span aria-hidden="true">↗</span></a>
+                  <% elsif field.field_type == "boolean" %>
+                    <span class="status-pill <%= value ? 'status-pill--public' : 'status-pill--private' %>"><%= value ? t("common.yes", default: "Yes") : t("common.no", default: "No") %></span>
+                  <% else %>
+                    <%= value.presence || "—" %>
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <div class="panel__body">
+        <%= render "shared/empty_state", title: t("items.no_custom_fields", default: "No custom fields"), description: t("items.no_custom_fields_description", default: "The owner can add fields to collect structured information for this item."), icon: "empty" %>
+      </div>
+    <% end %>
+  </section>
+
+  <aside class="side-stack">
+    <section class="side-card">
+      <h3><%= t("items.record", default: "Record") %></h3>
+      <dl class="side-stat-list">
+        <div><dt><%= t("items.inventory_id", default: "Inventory ID") %></dt><dd><%= item.custom_id %></dd></div>
+        <div><dt><%= t("common.created", default: "Created") %></dt><dd><%= item.created_at&.strftime("%b %-d, %Y") %></dd></div>
+        <div><dt><%= t("common.updated", default: "Updated") %></dt><dd><%= item.updated_at&.strftime("%b %-d, %Y") %></dd></div>
+        <div><dt><%= t("common.likes", default: "Likes") %></dt><dd><%= item.likes_count.to_i %></dd></div>
+      </dl>
+    </section>
+    <% if inventory.description.present? %>
+      <section class="side-card">
+        <h3><%= t("items.about_inventory", default: "About this inventory") %></h3>
+        <div class="section-copy markdown-body"><%= render "shared/markdown", text: inventory.description %></div>
+      </section>
+    <% end %>
+  </aside>
+</div>

@@ -1,0 +1,72 @@
+<% content_for :title, "Create account · Stockroom" %>
+
+<div class="auth-shell">
+  <section class="auth-card" aria-labelledby="sign-up-heading">
+    <div class="auth-card__intro">
+      <span class="brand__mark" aria-hidden="true">
+        <svg viewBox="0 0 32 32"><path d="M7 8.5 16 4l9 4.5v15L16 28l-9-4.5v-15Z" fill="none" stroke="currentColor" stroke-width="2"/><path d="m7.5 8.8 8.5 4.4 8.5-4.4M16 13.2V28" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+      </span>
+      <span class="eyebrow"><%= t("auth.get_started", default: "Get started") %></span>
+      <h1 id="sign-up-heading"><%= t("auth.sign_up.heading", default: "Create your account") %></h1>
+      <p><%= t("auth.sign_up.description", default: "Build reusable inventories and collaborate with your team.") %></p>
+    </div>
+
+    <div class="auth-providers">
+      <%= form_with url: "/auth/google_oauth2", method: :post, class: "auth-provider-form" do %>
+        <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token if respond_to?(:form_authenticity_token) %>">
+        <button class="button button--secondary auth-provider" type="submit">
+          <span class="auth-provider__icon auth-provider__icon--google" aria-hidden="true">G</span>
+          <%= t("auth.continue_google", default: "Continue with Google") %>
+        </button>
+      <% end %>
+      <%= form_with url: "/auth/facebook", method: :post, class: "auth-provider-form" do %>
+        <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token if respond_to?(:form_authenticity_token) %>">
+        <button class="button button--secondary auth-provider" type="submit">
+          <span class="auth-provider__icon auth-provider__icon--facebook" aria-hidden="true">f</span>
+          <%= t("auth.continue_facebook", default: "Continue with Facebook") %>
+        </button>
+      <% end %>
+    </div>
+
+    <div class="auth-divider"><span><%= t("auth.or_email", default: "or use email") %></span></div>
+
+    <%= form_with url: sign_up_path, method: :post, scope: :user do |form| %>
+      <div class="form-field">
+        <%= form.label :name, t("auth.name", default: "Name"), class: "form-label" %>
+        <%= form.text_field :name, class: "form-control", required: true, autofocus: true, autocomplete: "name", placeholder: "Your name" %>
+      </div>
+      <div class="form-field" style="margin-top: 16px;">
+        <%= form.label :email, t("auth.email", default: "Email address"), class: "form-label" %>
+        <%= form.email_field :email, class: "form-control", required: true, autocomplete: "email", placeholder: "you@example.com" %>
+      </div>
+      <div class="form-grid" style="margin-top: 16px;">
+        <div class="form-field">
+          <%= form.label :password, t("auth.password", default: "Password"), class: "form-label" %>
+          <%= form.password_field :password, class: "form-control", required: true, autocomplete: "new-password" %>
+        </div>
+        <div class="form-field">
+          <%= form.label :password_confirmation, t("auth.password_confirmation", default: "Confirm password"), class: "form-label" %>
+          <%= form.password_field :password_confirmation, class: "form-control", required: true, autocomplete: "new-password" %>
+        </div>
+      </div>
+      <div class="form-actions">
+        <%= form.submit t("auth.sign_up.submit", default: "Create account"), class: "button button--primary" %>
+      </div>
+    <% end %>
+
+    <p class="auth-switch"><%= t("auth.have_account", default: "Already have an account?") %> <a href="<%= sign_in_path %>"><%= t("auth.sign_in.link", default: "Sign in") %></a></p>
+  </section>
+
+  <aside class="auth-aside" aria-hidden="true">
+    <div class="auth-aside__content">
+      <span class="eyebrow"><%= t("auth.promise.eyebrow", default: "One calm workspace") %></span>
+      <h2><%= t("auth.promise.signup_heading", default: "Give every collection a structure people understand.") %></h2>
+      <p><%= t("auth.promise.description", default: "Structured fields, flexible identifiers, and thoughtful access controls—without the clutter.") %></p>
+      <div class="auth-feature-list">
+        <span>✓ Custom inventory IDs</span>
+        <span>✓ Reusable field templates</span>
+        <span>✓ Granular shared access</span>
+      </div>
+    </div>
+  </aside>
+</div>

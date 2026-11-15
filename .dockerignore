@@ -1,0 +1,16 @@
+.git
+.gitignore
+.bundle
+vendor/bundle
+vendor/gems
+vendor/cache
+log/*
+tmp/*
+!log/.keep
+!tmp/.keep
+!tmp/pids/
+!tmp/pids/.keep
+storage
+test
+.env*
+config/master.key

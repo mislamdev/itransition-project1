@@ -1,0 +1,48 @@
+<% field = local_assigns.fetch(:field) %>
+<% inventory = local_assigns.fetch(:inventory, field.inventory) %>
+<% persisted = field.persisted? %>
+
+<%= form_with url: (persisted ? inventory_field_path(inventory, field) : inventory_fields_path(inventory)), method: (persisted ? :patch : :post), scope: :field do |form| %>
+  <div class="form-grid">
+    <div class="form-field form-field--wide">
+      <%= form.label :title, t("fields.form.title", default: "Title"), class: "form-label" %>
+      <%= form.text_field :title, class: "form-control", required: true, maxlength: 120, placeholder: t("fields.form.title_placeholder", default: "e.g. Model or Purchase year") %>
+    </div>
+
+    <div class="form-field form-field--wide">
+      <%= form.label :description, t("fields.form.description", default: "Description / hint"), class: "form-label" %>
+      <%= form.text_area :description, class: "form-control", rows: 4, placeholder: t("fields.form.description_placeholder", default: "Optional guidance shown beside the field.") %>
+    </div>
+
+    <div class="form-field">
+      <%= form.label :field_type, t("fields.form.type", default: "Field type"), class: "form-label" %>
+      <%= form.select :field_type,
+            [[t("fields.types.text", default: "Single-line text"), "text"], [t("fields.types.textarea", default: "Multi-line text"), "textarea"], [t("fields.types.number", default: "Number"), "number"], [t("fields.types.document", default: "Document or image link"), "document"], [t("fields.types.boolean", default: "True / false"), "boolean"], [t("fields.types.select", default: "Choose from a list"), "select"]],
+            { include_blank: t("fields.form.choose_type", default: "Choose a type") }, class: "form-select" %>
+      <p class="form-hint"><%= t("fields.form.type_hint", default: "Use a single-line field for short values and a multi-line field for notes.") %></p>
+    </div>
+
+    <div class="form-field">
+      <label class="check-control">
+        <%= form.check_box :show_in_table, class: "form-check-input" %>
+        <span class="check-control__copy">
+          <strong><%= t("fields.form.show_in_table", default: "Show in item table") %></strong>
+          <span><%= t("fields.form.show_in_table_hint", default: "Include this field as a column on the inventory’s items tab.") %></span>
+        </span>
+      </label>
+    </div>
+
+    <% if field.field_type == "select" %>
+      <div class="form-field form-field--wide">
+        <%= form.label :options, t("fields.form.choices", default: "Choices"), class: "form-label" %>
+        <%= form.text_area :options, value: field.options.is_a?(Hash) ? Array(field.options["values"]).join("\n") : field.options.to_s, class: "form-control", rows: 6, placeholder: "Desktop&#10;Laptop&#10;Tablet" %>
+        <p class="form-hint"><%= t("fields.form.choices_hint", default: "Enter one choice per line.") %></p>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="form-actions">
+    <%= link_to t("common.cancel", default: "Cancel"), inventory_fields_path(inventory), class: "button button--ghost" %>
+    <%= form.submit(persisted ? t("fields.form.save", default: "Save field") : t("fields.form.add", default: "Add field"), class: "button button--primary") %>
+  </div>
+<% end %>

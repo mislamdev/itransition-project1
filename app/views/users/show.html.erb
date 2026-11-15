@@ -1,0 +1,57 @@
+<% person = @user || local_assigns[:user] || current_user %>
+<% owned_inventories = @owned_inventories || @inventories || [] %>
+<% writable_inventories = @writable_inventories || @accessible_inventories || [] %>
+<% manageable = user_signed_in? && (current_user == person || admin?) %>
+<% content_for :title, "#{person.name.presence || person.email} · Stockroom" %>
+
+<header class="profile-header">
+  <span class="profile-avatar" aria-hidden="true"><%= (person.name.presence || person.email).first.to_s.upcase %></span>
+  <div>
+    <h1><%= person.name.presence || person.email.split("@").first %></h1>
+    <p><%= person.email %> · <%= pluralize(owned_inventories.size, t("users.owned_inventory_count", default: "owned inventory"), plural: t("users.owned_inventory_count_plural", default: "owned inventories")) %></p>
+  </div>
+  <% if manageable %>
+    <a class="button button--primary" href="<%= profile_path %>"><%= t("users.manage_workspace", default: "Manage my workspace") %></a>
+  <% end %>
+</header>
+
+<div class="profile-grid">
+  <section class="panel inventory-list-panel" aria-labelledby="owned-inventories-heading">
+    <header class="filter-bar">
+      <div class="filter-bar__group">
+        <h2 id="owned-inventories-heading" class="sr-only"><%= t("users.owned_heading", default: "Owned inventories") %></h2>
+        <input class="filter-input" type="search" placeholder="<%= t("users.filter_owned", default: "Filter owned inventories…") %>" autocomplete="off" data-table-filter="owned-inventories-table">
+        <select class="filter-input" aria-label="<%= t("users.sort_owned", default: "Sort owned inventories") %>" data-table-sort="owned-inventories-table">
+          <option value=""><%= t("users.default_order", default: "Default order") %></option>
+          <option value="name"><%= t("users.sort_name", default: "Name") %></option>
+          <option value="newest"><%= t("users.sort_newest", default: "Newest") %></option>
+          <option value="oldest"><%= t("users.sort_oldest", default: "Oldest") %></option>
+        </select>
+      </div>
+      <% if manageable %>
+        <div class="filter-bar__group">
+          <button class="button button--secondary button--small" type="button" data-edit-owned disabled><%= t("users.edit_selected", default: "Edit selected") %></button>
+          <button class="button button--ghost button--small text-danger" type="button" data-delete-owned disabled
+                  data-confirm-message="<%= t("users.delete_confirmation", default: "Delete the selected inventories? This cannot be undone.") %>"><%= t("users.delete_selected", default: "Delete selected") %></button>
+        </div>
+      <% end %>
+    </header>
+    <%= render "users/owned_inventories_table", user: person, inventories: owned_inventories, manageable: manageable, table_id: "owned-inventories-table" %>
+  </section>
+
+  <section class="panel inventory-list-panel" aria-labelledby="writable-inventories-heading">
+    <header class="filter-bar">
+      <div class="filter-bar__group">
+        <h2 id="writable-inventories-heading" class="sr-only"><%= t("users.shared_heading", default: "Shared inventories") %></h2>
+        <input class="filter-input" type="search" placeholder="<%= t("users.filter_shared", default: "Filter shared inventories…") %>" autocomplete="off" data-table-filter="writable-inventories-table">
+        <select class="filter-input" aria-label="<%= t("users.sort_shared", default: "Sort shared inventories") %>" data-table-sort="writable-inventories-table">
+          <option value=""><%= t("users.default_order", default: "Default order") %></option>
+          <option value="name"><%= t("users.sort_name", default: "Name") %></option>
+          <option value="newest"><%= t("users.sort_newest", default: "Newest") %></option>
+          <option value="oldest"><%= t("users.sort_oldest", default: "Oldest") %></option>
+        </select>
+      </div>
+    </header>
+    <%= render "users/writable_inventories_table", inventories: writable_inventories, table_id: "writable-inventories-table" %>
+  </section>
+</div>

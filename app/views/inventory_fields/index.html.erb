@@ -1,0 +1,83 @@
+<% inventory = @inventory || local_assigns[:inventory] %>
+<% fields = @fields || inventory.fields.sort_by(&:position) %>
+<% content_for :title, t("fields.title", default: "Fields · %{inventory} · Stockroom", inventory: inventory.title) %>
+
+<header class="page-header">
+  <div class="page-header__copy">
+    <a class="table-link" href="<%= inventory_path(inventory) %>"><%= t("common.back_to_inventory", default: "← Back to %{inventory}", inventory: inventory.title) %></a>
+    <h1><%= t("fields.heading", default: "Custom fields") %></h1>
+    <p><%= t("fields.description", default: "Define the structured information collected for every item. Drag rows to reorder them, or select a field and use the keyboard-friendly controls above.") %></p>
+  </div>
+</header>
+
+<%= render "inventories/tabs", inventory: inventory, active_tab: "fields" %>
+
+<div class="inventory-content-grid inventory-content-grid--wide">
+  <section class="panel inventory-list-panel" aria-labelledby="fields-heading">
+    <header class="filter-bar">
+      <div class="filter-bar__group">
+        <h2 id="fields-heading" class="sr-only"><%= t("fields.table_heading", default: "Inventory fields") %></h2>
+        <a class="button button--primary button--small" href="<%= new_inventory_field_path(inventory) %>"><%= t("fields.add", default: "Add field") %></a>
+        <button class="button button--secondary button--small" type="button" data-reorder-move="up" disabled><%= t("fields.move_up", default: "Move up") %></button>
+        <button class="button button--secondary button--small" type="button" data-reorder-move="down" disabled><%= t("fields.move_down", default: "Move down") %></button>
+        <button class="button button--ghost button--small" type="button" data-reorder-save disabled><%= t("fields.save_order", default: "Save order") %></button>
+        <button class="button button--ghost button--small text-danger" type="button" data-delete-selected disabled
+                data-confirm-message="<%= t("fields.delete_confirmation", default: "Delete this field and its values? This cannot be undone.") %>"><%= t("fields.delete_selected", default: "Delete selected") %></button>
+      </div>
+      <span class="toolbar__label"><%= pluralize(fields.size, t("common.field_count", default: "field"), plural: t("common.field_count_plural", default: "fields")) %></span>
+    </header>
+
+    <% if fields.any? %>
+      <div class="table-wrap">
+        <table class="data-table field-table" data-field-reorder-table data-reorder-url="<%= reorder_inventory_fields_path(inventory) %>">
+          <caption class="sr-only"><%= t("fields.table_caption", default: "Custom fields for %{inventory}, in display order", inventory: inventory.title) %></caption>
+          <thead>
+            <tr>
+              <th scope="col"><span class="sr-only"><%= t("common.select", default: "Select") %></span></th>
+              <th scope="col"><%= t("common.field", default: "Field") %></th>
+              <th scope="col"><%= t("common.type", default: "Type") %></th>
+              <th scope="col"><%= t("fields.in_table", default: "In table") %></th>
+              <th scope="col"><%= t("common.description", default: "Description") %></th>
+            </tr>
+          </thead>
+          <tbody data-field-reorder-list>
+            <% fields.each do |field| %>
+              <tr draggable="true" data-field-id="<%= field.id %>" data-field-row data-field-delete-path="<%= inventory_field_path(inventory, field) %>">
+                <td>
+                  <label class="sr-only" for="field-select-<%= field.id %>"><%= t("fields.select", default: "Select %{title}", title: field.title) %></label>
+                  <input id="field-select-<%= field.id %>" type="checkbox" value="<%= field.id %>" data-field-select>
+                </td>
+                <td>
+                  <span class="drag-handle" aria-hidden="true" title="<%= t("fields.drag_handle", default: "Drag to reorder") %>">⠿</span>
+                  <a class="table-primary" href="<%= edit_inventory_field_path(inventory, field) %>"><%= field.title %></a>
+                </td>
+                <td><span class="status-pill status-pill--info"><%= t("fields.types.#{field.field_type}", default: field.field_type.to_s.humanize) %></span></td>
+                <td><%= field.show_in_table? ? t("common.yes", default: "Yes") : t("common.no", default: "No") %></td>
+                <td class="table-description"><%= field.description.presence || "—" %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+      <div class="panel__footer">
+        <span class="autosave-status" data-reorder-status data-state="saved"
+              data-saved-message="<%= t("fields.order_saved", default: "Field order is up to date") %>"
+              data-error-message="<%= t("fields.order_error", default: "Could not save field order") %>"><%= t("fields.order_saved", default: "Field order is up to date") %></span>
+      </div>
+    <% else %>
+      <%= render "shared/empty_state",
+                title: t("fields.empty", default: "No custom fields"),
+                description: t("fields.empty_description", default: "Add text, number, document, or checkbox fields to collect the information your team needs."),
+                icon: "empty",
+                action_label: t("fields.add_first", default: "Add first field"),
+                action_path: new_inventory_field_path(inventory) %>
+    <% end %>
+  </section>
+</div>
+
+<div class="field-limits" aria-label="<%= t("fields.limits_label", default: "Field type limits") %>">
+  <% { "text" => 3, "textarea" => 3, "number" => 3, "document" => 3, "boolean" => 3 }.each do |kind, limit| %>
+    <% used = fields.count { |field| field.field_type == kind } %>
+    <span class="limit-badge <%= 'is-near-limit' if used >= limit %>"><%= t("fields.types.#{kind}", default: kind.humanize) %>: <%= used %>/<%= limit %></span>
+  <% end %>
+</div>

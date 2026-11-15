@@ -1,0 +1,18 @@
+<% field = @field || local_assigns[:field] %>
+<% inventory = field.inventory %>
+<% content_for :title, t("fields.edit_title", default: "Edit %{field} · %{inventory} · Stockroom", field: field.title, inventory: inventory.title) %>
+
+<div class="item-form-shell">
+  <header class="page-header">
+    <div class="page-header__copy">
+      <a class="table-link" href="<%= inventory_fields_path(inventory) %>"><%= t("fields.back", default: "← Back to fields") %></a>
+      <h1><%= t("fields.edit_heading", default: "Edit %{field}", field: field.title) %></h1>
+      <p><%= t("fields.edit_description", default: "Changes apply to the item form and table for this inventory.") %></p>
+    </div>
+  </header>
+  <section class="panel">
+    <header class="panel__header"><div><h2><%= t("fields.details_heading", default: "Field details") %></h2><p class="section-copy"><%= t("fields.edit_details_description", default: "Update the label, guidance, type, or table visibility.") %></p></div></header>
+    <div class="panel__body"><%= render "form", inventory: inventory, field: field %></div>
+    <footer class="panel__footer"><%= button_to t("fields.delete", default: "Delete field"), inventory_field_path(inventory, field), method: :delete, class: "button button--danger", form: { data: { confirm: t("fields.delete_confirmation", default: "Delete this field and its values? This cannot be undone.") } } %></footer>
+  </section>
+</div>

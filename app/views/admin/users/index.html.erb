@@ -1,0 +1,94 @@
+<% users = @users || [] %>
+<% content_for :title, t("admin.users.title", default: "User administration · Stockroom") %>
+
+<header class="page-header">
+  <div class="page-header__copy">
+    <span class="eyebrow"><%= t("admin.eyebrow", default: "Administration") %></span>
+    <h1><%= t("admin.users.heading", default: "User management") %></h1>
+    <p><%= t("admin.users.description", default: "Manage account access, blocking, and administrator roles.") %></p>
+  </div>
+</header>
+
+<div class="admin-summary" aria-label="<%= t("admin.users.summary_label", default: "User overview") %>">
+  <div class="stats-card"><strong><%= number_with_delimiter((@user_count || users.size).to_i) %></strong><span><%= t("admin.users.total", default: "Registered users") %></span></div>
+  <div class="stats-card"><strong><%= number_with_delimiter((@admin_count || users.count(&:admin?).to_i).to_i) %></strong><span><%= t("admin.users.admins", default: "Administrators") %></span></div>
+  <div class="stats-card"><strong><%= number_with_delimiter((@blocked_count || users.count { |user| user.respond_to?(:blocked?) && user.blocked? }.to_i).to_i) %></strong><span><%= t("admin.users.blocked", default: "Blocked accounts") %></span></div>
+</div>
+
+<section class="panel inventory-list-panel" aria-labelledby="admin-users-heading">
+  <header class="filter-bar">
+    <div class="filter-bar__group">
+      <h2 id="admin-users-heading" class="sr-only"><%= t("admin.users.table_heading", default: "Registered users") %></h2>
+      <label class="sr-only" for="admin-user-filter"><%= t("admin.users.filter_label", default: "Filter users") %></label>
+      <input id="admin-user-filter" class="filter-input" type="search" placeholder="<%= t("admin.users.filter_placeholder", default: "Filter users…") %>" autocomplete="off" data-table-filter="admin-users-table">
+      <select class="filter-input" aria-label="<%= t("admin.users.status_filter", default: "Filter account status") %>" data-admin-user-filter>
+        <option value=""><%= t("admin.users.all_accounts", default: "All accounts") %></option>
+        <option value="active"><%= t("admin.users.active", default: "Active") %></option>
+        <option value="blocked"><%= t("admin.users.blocked_status", default: "Blocked") %></option>
+        <option value="admin"><%= t("admin.users.admins", default: "Administrators") %></option>
+      </select>
+    </div>
+    <div class="filter-bar__group">
+      <button class="button button--secondary button--small" type="button" data-admin-user-action="block" disabled><%= t("admin.users.block", default: "Block") %></button>
+      <button class="button button--secondary button--small" type="button" data-admin-user-action="unblock" disabled><%= t("admin.users.unblock", default: "Unblock") %></button>
+      <button class="button button--secondary button--small" type="button" data-admin-user-action="grant-admin" disabled><%= t("admin.users.grant_admin", default: "Make admin") %></button>
+      <button class="button button--secondary button--small" type="button" data-admin-user-action="revoke-admin" disabled><%= t("admin.users.revoke_admin", default: "Remove admin") %></button>
+      <button class="button button--ghost button--small text-danger" type="button" data-admin-user-action="delete" disabled
+              data-confirm-message="<%= t("admin.users.delete_confirmation", default: "Delete the selected accounts? This cannot be undone.") %>"><%= t("admin.users.delete", default: "Delete") %></button>
+    </div>
+  </header>
+
+  <% if users.any? %>
+    <div class="table-wrap">
+      <table class="data-table" id="admin-users-table">
+        <caption class="sr-only"><%= t("admin.users.table_caption", default: "Registered users and their account roles") %></caption>
+        <thead>
+          <tr>
+            <th scope="col"><span class="sr-only"><%= t("common.select", default: "Select") %></span></th>
+            <th scope="col"><%= t("admin.users.user", default: "User") %></th>
+            <th scope="col"><%= t("common.email", default: "Email") %></th>
+            <th scope="col"><%= t("admin.users.role", default: "Role") %></th>
+            <th scope="col"><%= t("admin.users.status", default: "Status") %></th>
+            <th scope="col"><%= t("admin.users.joined", default: "Joined") %></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% users.each do |person| %>
+            <% is_admin = person.respond_to?(:admin?) && person.admin? %>
+            <% is_blocked = person.respond_to?(:blocked?) && person.blocked? %>
+            <tr data-admin-user-row data-user-id="<%= person.id %>" data-user-path="<%= admin_user_path(person) %>" data-user-admin="<%= is_admin %>" data-user-blocked="<%= is_blocked %>" data-user-current="<%= person == current_user %>" data-filter-text="<%= [person.name, person.email].compact.join(" ").downcase %>">
+              <td>
+                <label class="sr-only" for="admin-user-select-<%= person.id %>"><%= t("admin.users.select", default: "Select %{name}", name: person.name.presence || person.email) %></label>
+                <input id="admin-user-select-<%= person.id %>" type="checkbox" value="<%= person.id %>" data-admin-user-select>
+              </td>
+              <td>
+                <div class="user-cell">
+                  <span class="avatar" aria-hidden="true"><%= (person.name.presence || person.email).first.to_s.upcase %></span>
+                  <span>
+                    <a class="user-cell__name" href="<%= user_path(person) %>"><%= person.name.presence || person.email.split("@").first %></a>
+                    <span class="user-cell__email"><%= person == current_user ? t("admin.users.you", default: "You") : t("common.registered_user", default: "Registered user") %></span>
+                  </span>
+                </div>
+              </td>
+              <td><%= person.email %></td>
+              <td><span class="status-pill <%= is_admin ? 'status-pill--info' : 'status-pill--private' %>"><%= is_admin ? t("admin.users.admin", default: "Administrator") : t("admin.users.member", default: "Member") %></span></td>
+              <td><span class="status-pill <%= is_blocked ? 'status-pill--danger' : 'status-pill--public' %>"><span class="status-pill__dot" aria-hidden="true"></span><%= is_blocked ? t("admin.users.blocked_status", default: "Blocked") : t("admin.users.active", default: "Active") %></span></td>
+              <td><span class="table-secondary"><%= person.created_at&.strftime("%b %-d, %Y") %></span></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+    <div class="empty-state" data-filter-empty hidden>
+      <h3><%= t("admin.users.no_matches", default: "No matching users") %></h3>
+      <p><%= t("admin.users.clear_filters", default: "Clear the filter to see every account.") %></p>
+    </div>
+  <% else %>
+    <%= render "shared/empty_state", title: t("admin.users.empty", default: "No users"), description: t("admin.users.empty_description", default: "Registered users will appear here."), icon: "empty" %>
+  <% end %>
+</section>
+
+<div class="panel panel__body" style="margin-top: 18px;">
+  <strong><%= t("admin.self_demotion_note", default: "Administrators can remove their own administrator access.") %></strong>
+  <p class="section-copy"><%= t("admin.self_demotion_help", default: "The change takes effect immediately and sends you back to the standard workspace view.") %></p>
+</div>

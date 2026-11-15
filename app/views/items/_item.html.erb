@@ -1,0 +1,8 @@
+<% item = local_assigns.fetch(:item) %>
+<% inventory = local_assigns.fetch(:inventory, item.inventory) %>
+
+<div class="item-preview">
+  <span class="item-preview__id"><%= item.custom_id %></span>
+  <h2><%= t("items.item_label", default: "Inventory item") %></h2>
+  <p class="section-copy"><%= t("items.from", default: "From") %> <a class="table-link" href="<%= inventory_path(inventory) %>"><%= inventory.title %></a></p>
+</div>

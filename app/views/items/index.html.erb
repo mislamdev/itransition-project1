@@ -1,0 +1,49 @@
+<% inventory = @inventory || local_assigns[:inventory] %>
+<% content_for :title, "#{inventory.title} · Stockroom" %>
+
+<section class="inventory-header">
+  <div class="inventory-header__top">
+    <div>
+      <span class="eyebrow"><%= inventory.category&.name.presence || t("items.inventory_label", default: "Inventory") %></span>
+      <h1><%= inventory.title %></h1>
+      <p class="inventory-header__description"><%= inventory.description.presence || t("items.no_description", default: "No description has been added yet.") %></p>
+      <div class="inventory-header__meta">
+        <span class="status-pill <%= inventory.is_public? ? 'status-pill--public' : 'status-pill--private' %>">
+          <span class="status-pill__dot" aria-hidden="true"></span>
+          <%= inventory.is_public? ? t("items.shared_with_all", default: "Shared with all members") : t("items.restricted_access", default: "Restricted access") %>
+        </span>
+        <span class="toolbar__label"><%= t("items.owned_by", default: "Owned by") %> <a class="table-link" href="<%= user_path(inventory.owner) %>"><%= inventory.owner&.name.presence || inventory.owner&.email.presence || t("common.unknown", default: "Unknown") %></a></span>
+        <span class="toolbar__label">· <%= pluralize(inventory.items_count.to_i, t("common.item_count", default: "item"), plural: t("common.item_count_plural", default: "items")) %></span>
+      </div>
+    </div>
+    <% if can_write_items?(inventory) %>
+      <div class="inventory-header__actions">
+        <a class="button button--primary" href="<%= new_inventory_item_path(inventory) %>">
+          <svg class="button__icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 4v12M4 10h12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <%= t("items.add", default: "Add item") %>
+        </a>
+      </div>
+    <% end %>
+  </div>
+</section>
+
+<%= render "inventories/tabs", inventory: inventory, active_tab: "items" %>
+
+<% unless user_signed_in? %>
+  <div class="panel panel__body" style="margin-bottom: 20px;">
+    <strong><%= t("items.read_only", default: "You’re viewing a read-only inventory.") %></strong>
+    <span class="muted"> <a href="<%= sign_in_path %>"><%= t("common.sign_in", default: "Sign in") %></a> <%= t("items.sign_in_to_edit", default: "to add or edit items when access allows.") %></span>
+  </div>
+<% end %>
+
+<section class="panel inventory-list-panel" aria-labelledby="items-heading">
+  <header class="filter-bar">
+    <div class="filter-bar__group">
+      <h2 id="items-heading" class="sr-only"><%= t("items.heading", default: "Inventory items") %></h2>
+      <label class="sr-only" for="item-filter"><%= t("items.filter_label", default: "Filter items") %></label>
+      <input class="filter-input" id="item-filter" type="search" placeholder="<%= t("items.filter_placeholder", default: "Filter items…") %>" autocomplete="off" data-table-filter="inventory-items-table">
+    </div>
+    <span class="toolbar__label"><%= pluralize(inventory.items_count.to_i, t("common.item_count", default: "item"), plural: t("common.item_count_plural", default: "items")) %></span>
+  </header>
+  <%= render "items/items_table", inventory: inventory, items: (@items || inventory.items) %>
+</section>

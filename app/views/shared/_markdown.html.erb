@@ -1,0 +1,5 @@
+<%= sanitize(
+      Markdown.render(local_assigns.fetch(:text)),
+      tags: %w[p br strong em b i blockquote code pre ul ol li a h1 h2 h3 h4 h5 h6 hr table thead tbody tr th td del],
+      attributes: %w[href title rel target]
+    ) %>

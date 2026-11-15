@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="<%= I18n.locale.to_s %>" data-theme="<%= current_theme %>">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="color-scheme" content="light dark">
+    <meta name="account-theme" content="<%= user_signed_in? ? current_theme : '' %>">
+    <title><%= content_for?(:title) ? yield(:title) : t("app.name", default: "Stockroom · Inventory") %></title>
+    <meta name="description" content="<%= content_for?(:meta_description) ? yield(:meta_description) : t("app.description", default: "A calm, collaborative workspace for cataloguing inventories.") %>">
+
+    <%= csrf_meta_tags %>
+    <% signed_in = user_signed_in? %>
+    <%= csp_meta_tag if respond_to?(:csp_meta_tag) %>
+    <%= stylesheet_link_tag "vendor/bootstrap.min.css", "application.css", "data-turbo-track": "reload" %>
+    <%= javascript_include_tag "vendor/bootstrap.bundle.min.js", defer: false %>
+    <%= javascript_importmap_tags %>
+    <%= yield :head %>
+
+    <script>
+      (function () {
+        try {
+          var savedTheme = localStorage.getItem("stockroom-theme");
+          var cookieTheme = document.cookie.match(/(?:^|; )stockroom_theme=([^;]+)/);
+          var accountTheme = document.querySelector('meta[name="account-theme"]')?.content;
+          var theme = accountTheme || savedTheme || (cookieTheme && cookieTheme[1]) || "light";
+          document.documentElement.dataset.theme = theme === "dark" ? "dark" : "light";
+        } catch (error) {
+          document.documentElement.dataset.theme = "light";
+        }
+      })();
+    </script>
+  </head>
+
+  <body class="app-body" data-signed-in="<%= user_signed_in? %>" data-settings-url="<%= settings_path %>">
+    <a class="skip-link" href="#main-content"><%= t("app.layout.skip_to_content", default: "Skip to content") %></a>
+
+    <header class="topbar" data-app-header>
+      <div class="topbar__inner">
+        <a class="brand" href="<%= root_path %>" aria-label="<%= t("app.name", default: "Stockroom") %>">
+          <span class="brand__mark" aria-hidden="true">
+            <svg viewBox="0 0 32 32" role="img">
+              <path d="M7 8.5 16 4l9 4.5v15L16 28l-9-4.5v-15Z" fill="none" stroke="currentColor" stroke-width="2"/>
+              <path d="m7.5 8.8 8.5 4.4 8.5-4.4M16 13.2V28" fill="none" stroke="currentColor" stroke-width="2"/>
+              <path d="m12 10.8 8.5-4.2" fill="none" stroke="currentColor" stroke-width="2" opacity=".55"/>
+            </svg>
+          </span>
+          <span class="brand__name"><%= t("app.name", default: "Stockroom") %></span>
+        </a>
+
+        <form class="global-search" action="<%= search_path %>" method="get" role="search" data-global-search>
+          <svg class="global-search__icon" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/>
+            <path d="m16 16 4 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <label class="sr-only" for="global-search-input"><%= t("app.layout.search_label", default: "Search inventories, items, and people") %></label>
+          <input id="global-search-input" type="search" name="q" value="<%= params[:q] %>" placeholder="<%= t("app.layout.search_placeholder", default: "Search inventories, items, people…") %>" autocomplete="off" data-search-input>
+          <kbd class="global-search__hint" aria-hidden="true">⌘ K</kbd>
+        </form>
+
+        <div class="topbar__actions">
+          <details class="menu menu--compact" data-menu>
+            <summary class="icon-button" aria-label="<%= t("app.layout.language", default: "Language") %>">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/>
+                <path d="M3.5 12h17M12 3c2.2 2.45 3.3 5.45 3.3 9S14.2 18.55 12 21c-2.2-2.45-3.3-5.45-3.3-9S9.8 5.45 12 3Z" fill="none" stroke="currentColor" stroke-width="1.8"/>
+              </svg>
+            </summary>
+            <div class="menu__panel menu__panel--right">
+              <p class="menu__label"><%= t("app.layout.language", default: "Language") %></p>
+              <form action="<%= signed_in ? settings_path : request.path %>" method="<%= signed_in ? 'post' : 'get' %>" data-language-form>
+                <% if signed_in %>
+                  <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token if respond_to?(:form_authenticity_token) %>">
+                <% end %>
+                <button type="submit" name="locale" value="en" class="menu__item <%= 'is-active' if I18n.locale.to_s.start_with?('en') %>" data-locale-option="en">
+                  <span><%= t("app.languages.english", default: "English") %></span><span class="menu__check">✓</span>
+                </button>
+                <button type="submit" name="locale" value="es" class="menu__item <%= 'is-active' if I18n.locale.to_s.start_with?('es') %>" data-locale-option="es">
+                  <span><%= t("app.languages.spanish", default: "Español") %></span><span class="menu__check">✓</span>
+                </button>
+              </form>
+            </div>
+          </details>
+
+          <button class="icon-button" type="button" data-theme-toggle aria-label="<%= t("app.layout.toggle_theme", default: "Toggle color theme") %>" title="<%= t("app.layout.toggle_theme", default: "Toggle theme") %>">
+            <svg class="theme-icon theme-icon--sun" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/>
+              <path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+            <svg class="theme-icon theme-icon--moon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M20.2 15.3A8.6 8.6 0 0 1 8.7 3.8 8.6 8.6 0 1 0 20.2 15.3Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+            </svg>
+          </button>
+
+          <% user_label = if signed_in
+                current_user.respond_to?(:name) && current_user.name.present? ? current_user.name : current_user.email.to_s
+              else
+                t("app.layout.guest", default: "Guest")
+              end %>
+
+          <% if signed_in %>
+            <details class="menu" data-menu>
+              <summary class="account-trigger" aria-label="<%= t("app.layout.account_menu", default: "Account menu") %>">
+                <span class="avatar" aria-hidden="true"><%= user_label.first.to_s.upcase %></span>
+                <span class="account-trigger__name"><%= user_label %></span>
+                <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m6 8 4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </summary>
+              <div class="menu__panel menu__panel--right">
+                <p class="menu__label"><%= t("app.layout.account", default: "Account") %></p>
+                <a class="menu__item" href="<%= user_path(current_user) %>"><%= t("app.layout.my_workspace", default: "My workspace") %></a>
+                <% if admin? && respond_to?(:admin_users_path) %>
+                  <a class="menu__item" href="<%= admin_users_path %>"><%= t("app.layout.administration", default: "Administration") %></a>
+                <% end %>
+                <form action="<%= sign_out_path %>" method="post">
+                  <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token if respond_to?(:form_authenticity_token) %>">
+                  <%= hidden_field_tag :_method, :delete %>
+                  <button class="menu__item menu__item--danger" type="submit"><%= t("app.layout.sign_out", default: "Sign out") %></button>
+                </form>
+              </div>
+            </details>
+          <% else %>
+            <a class="button button--secondary button--small" href="<%= sign_in_path %>"><%= t("app.layout.sign_in", default: "Sign in") %></a>
+          <% end %>
+        </div>
+      </div>
+    </header>
+
+    <main id="main-content" class="app-main" tabindex="-1">
+      <%= render "shared/flash" %>
+      <%= yield %>
+    </main>
+
+    <footer class="app-footer">
+      <div class="container app-footer__inner">
+        <span><%= t("app.name", default: "Stockroom") %></span>
+        <span aria-hidden="true">·</span>
+        <span><%= t("app.footer.tagline", default: "Inventory, without the clutter.") %></span>
+        <span class="app-footer__spacer"></span>
+        <span><%= t("app.languages.english", default: "English") %> / <%= t("app.languages.spanish", default: "Español") %></span>
+      </div>
+    </footer>
+  </body>
+</html>

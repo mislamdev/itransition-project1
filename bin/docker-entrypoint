@@ -1,0 +1,8 @@
+#!/bin/bash -e
+
+# Prepare the database when the image starts the Rails server.
+if [ "${@: -2:1}" == "./bin/rails" ] && [ "${@: -1:1}" == "server" ]; then
+  ./bin/rails db:prepare
+fi
+
+exec "${@}"

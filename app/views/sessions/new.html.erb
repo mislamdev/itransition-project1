@@ -1,0 +1,62 @@
+<% content_for :title, "Sign in · Stockroom" %>
+
+<div class="auth-shell">
+  <section class="auth-card" aria-labelledby="sign-in-heading">
+    <div class="auth-card__intro">
+      <span class="brand__mark" aria-hidden="true">
+        <svg viewBox="0 0 32 32"><path d="M7 8.5 16 4l9 4.5v15L16 28l-9-4.5v-15Z" fill="none" stroke="currentColor" stroke-width="2"/><path d="m7.5 8.8 8.5 4.4 8.5-4.4M16 13.2V28" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+      </span>
+      <span class="eyebrow"><%= t("auth.welcome_back", default: "Welcome back") %></span>
+      <h1 id="sign-in-heading"><%= t("auth.sign_in.heading", default: "Sign in to Stockroom") %></h1>
+      <p><%= t("auth.sign_in.description", default: "Continue to your inventories, shared collections, and discussions.") %></p>
+    </div>
+
+    <div class="auth-providers">
+      <%= form_with url: "/auth/google_oauth2", method: :post, class: "auth-provider-form" do %>
+        <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token if respond_to?(:form_authenticity_token) %>">
+        <button class="button button--secondary auth-provider" type="submit">
+          <span class="auth-provider__icon auth-provider__icon--google" aria-hidden="true">G</span>
+          <%= t("auth.continue_google", default: "Continue with Google") %>
+        </button>
+      <% end %>
+      <%= form_with url: "/auth/facebook", method: :post, class: "auth-provider-form" do %>
+        <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token if respond_to?(:form_authenticity_token) %>">
+        <button class="button button--secondary auth-provider" type="submit">
+          <span class="auth-provider__icon auth-provider__icon--facebook" aria-hidden="true">f</span>
+          <%= t("auth.continue_facebook", default: "Continue with Facebook") %>
+        </button>
+      <% end %>
+    </div>
+
+    <div class="auth-divider"><span><%= t("auth.or_email", default: "or use email") %></span></div>
+
+    <%= form_with url: sign_in_path, method: :post, scope: :session do |form| %>
+      <div class="form-field">
+        <%= form.label :email, t("auth.email", default: "Email address"), class: "form-label" %>
+        <%= form.email_field :email, class: "form-control", required: true, autofocus: true, autocomplete: "email", placeholder: "you@example.com" %>
+      </div>
+      <div class="form-field" style="margin-top: 16px;">
+        <%= form.label :password, t("auth.password", default: "Password"), class: "form-label" %>
+        <%= form.password_field :password, class: "form-control", required: true, autocomplete: "current-password" %>
+      </div>
+      <div class="form-actions">
+        <%= form.submit t("auth.sign_in.submit", default: "Sign in"), class: "button button--primary" %>
+      </div>
+    <% end %>
+
+    <p class="auth-switch"><%= t("auth.no_account", default: "New to Stockroom?") %> <a href="<%= sign_up_path %>"><%= t("auth.create_account", default: "Create an account") %></a></p>
+  </section>
+
+  <aside class="auth-aside" aria-hidden="true">
+    <div class="auth-aside__content">
+      <span class="eyebrow"><%= t("auth.promise.eyebrow", default: "One calm workspace") %></span>
+      <h2><%= t("auth.promise.heading", default: "Every collection, exactly as your team sees it.") %></h2>
+      <p><%= t("auth.promise.description", default: "Structured fields, flexible identifiers, and thoughtful access controls—without the clutter.") %></p>
+      <div class="auth-preview-table" role="presentation">
+        <div class="auth-preview-table__head"><span>ID</span><span>Item</span><span>Status</span></div>
+        <div><code>KB-0007</code><span>Field guide</span><span class="status-pill status-pill--public">Ready</span></div>
+        <div><code>KB-0008</code><span>Atlas</span><span class="status-pill status-pill--public">Ready</span></div>
+      </div>
+    </div>
+  </aside>
+</div>

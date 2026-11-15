@@ -1,0 +1,62 @@
+<% inventory = local_assigns.fetch(:inventory) %>
+<% categories = local_assigns.fetch(:categories, []) %>
+<% autosave = local_assigns.fetch(:autosave, false) %>
+<% persisted = inventory.persisted? %>
+
+<%= form_with url: (persisted ? inventory_path(inventory) : inventories_path),
+              method: (persisted ? :patch : :post),
+              scope: :inventory,
+              data: (autosave ? { autosave_form: true, autosave_url: inventory_path(inventory), inventory_id: inventory.id } : {}) do |form| %>
+  <%= form.hidden_field :lock_version, value: inventory.lock_version if persisted && autosave %>
+
+  <div class="form-grid">
+    <div class="form-field form-field--wide">
+      <%= form.label :title, t("inventories.form.title", default: "Title"), class: "form-label" %>
+      <%= form.text_field :title, class: "form-control", required: true, maxlength: 160, placeholder: t("inventories.form.title_placeholder", default: "e.g. Studio equipment") %>
+    </div>
+
+    <div class="form-field form-field--wide">
+      <%= form.label :description, t("inventories.form.description", default: "Description"), class: "form-label" %>
+      <%= form.text_area :description, class: "form-control", rows: 7, placeholder: t("inventories.form.description_placeholder", default: "Describe what belongs in this inventory. Markdown is supported.") %>
+      <p class="form-hint"><%= t("inventories.form.description_hint", default: "Use Markdown for headings, links, and emphasis. User content is never translated.") %></p>
+    </div>
+
+    <div class="form-field">
+      <%= form.label :category_id, t("inventories.form.category", default: "Category"), class: "form-label" %>
+      <%= form.collection_select :category_id, categories, :id, :name, { prompt: t("inventories.form.choose_category", default: "Choose a category") }, class: "form-select" %>
+    </div>
+
+    <div class="form-field">
+      <%= form.label :image_url, t("inventories.form.image_url", default: "Illustration URL"), class: "form-label" %>
+      <%= form.url_field :image_url, class: "form-control", placeholder: "https://…", inputmode: "url" %>
+      <p class="form-hint"><%= t("inventories.form.image_hint", default: "Link to a cloud-hosted image; nothing is uploaded to this server.") %></p>
+    </div>
+
+    <div class="form-field form-field--wide">
+      <%= form.label :tag_list, t("inventories.form.tags", default: "Tags"), class: "form-label" %>
+      <%= form.text_field :tag_list, class: "form-control", value: inventory.tag_list, placeholder: t("inventories.form.tags_placeholder", default: "camera, equipment, studio"), autocomplete: "off", data: { tag_input: true, tag_suggestions_url: api_suggestions_tags_path } %>
+      <p class="form-hint"><%= t("inventories.form.tags_hint", default: "Separate tags with commas. Existing matching tags appear as you type.") %></p>
+    </div>
+
+    <div class="form-field form-field--wide">
+      <div class="switch-row">
+        <div>
+          <strong class="form-label mb-0"><%= t("inventories.form.public", default: "Public inventory") %></strong>
+          <p class="form-hint mt-1 mb-0"><%= t("inventories.form.public_hint", default: "Every signed-in user can add, edit, and delete items.") %></p>
+        </div>
+        <label class="switch">
+          <%= form.check_box :is_public, class: "form-check-input" %>
+          <span class="switch__track" aria-hidden="true"></span>
+          <span class="sr-only"><%= t("inventories.form.public_aria", default: "Make this inventory public") %></span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <% unless autosave %>
+      <%= link_to t("common.cancel", default: "Cancel"), persisted ? inventory_path(inventory) : inventories_path, class: "button button--ghost" %>
+      <%= form.submit(persisted ? t("common.save_changes", default: "Save changes") : t("inventories.create", default: "Create inventory"), class: "button button--primary") %>
+    <% end %>
+  </div>
+<% end %>

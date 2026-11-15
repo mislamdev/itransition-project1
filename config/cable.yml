@@ -1,0 +1,14 @@
+# Action Cable configuration.
+#
+# The application does not use Action Cable (the discussion tab is refreshed
+# by the client), so the in process adapter is used in every environment.
+# The test environment needs an adapter as well, otherwise the test helper
+# of Action Cable fails while it is setting the server up.
+development:
+  adapter: async
+
+test:
+  adapter: test
+
+production:
+  adapter: async

@@ -1,0 +1,84 @@
+<% content_for :title, t("inventories.title", default: "Inventories · Stockroom") %>
+
+<header class="page-header">
+  <div class="page-header__copy">
+    <span class="eyebrow"><%= t("inventories.eyebrow", default: "Catalogues") %></span>
+    <h1><%= t("inventories.heading", default: "Inventories") %></h1>
+    <p><%= t("inventories.description", default: "Explore every collection, or jump back into one you own or share.") %></p>
+  </div>
+  <% if user_signed_in? %>
+    <a class="button button--primary" href="<%= new_inventory_path %>">
+      <svg class="button__icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 4v12M4 10h12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <%= t("inventories.new", default: "New inventory") %>
+    </a>
+  <% end %>
+</header>
+
+<section class="panel inventory-list-panel" aria-labelledby="inventory-list-heading">
+  <h2 id="inventory-list-heading" class="sr-only"><%= t("inventories.all_heading", default: "All inventories") %></h2>
+  <div class="filter-bar">
+    <div class="filter-bar__group">
+      <label class="sr-only" for="inventory-filter"><%= t("inventories.filter_label", default: "Filter inventories") %></label>
+      <input class="filter-input" id="inventory-filter" type="search" placeholder="<%= t("inventories.filter_placeholder", default: "Filter this list…") %>" autocomplete="off" data-table-filter="inventory-list-table">
+      <select class="filter-input" aria-label="<%= t("inventories.visibility_filter", default: "Filter by visibility") %>" data-table-filter="inventory-list-table">
+        <option value=""><%= t("inventories.all_visibility", default: "All visibility") %></option>
+        <option value="<%= t("common.shared", default: "Shared") %>"><%= t("common.shared", default: "Shared") %></option>
+        <option value="<%= t("common.private", default: "Private") %>"><%= t("common.private", default: "Private") %></option>
+      </select>
+    </div>
+    <span class="toolbar__label"><%= pluralize((@inventories || []).size, t("common.inventory_count", default: "inventory"), plural: t("common.inventory_count_plural", default: "inventories")) %></span>
+  </div>
+
+  <% if (@inventories || []).any? %>
+    <div class="table-wrap">
+      <table class="data-table inventory-table" id="inventory-list-table">
+        <caption class="sr-only"><%= t("inventories.table_caption", default: "All available inventories") %></caption>
+        <thead>
+          <tr>
+            <th scope="col"><%= t("common.inventory", default: "Inventory") %></th>
+            <th scope="col"><%= t("common.description", default: "Description") %></th>
+            <th scope="col"><%= t("common.items", default: "Items") %></th>
+            <th scope="col"><%= t("common.owner", default: "Owner") %></th>
+            <th scope="col"><%= t("common.visibility", default: "Visibility") %></th>
+            <th scope="col"><span class="sr-only"><%= t("common.open_inventory", default: "Open inventory") %></span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @inventories.each do |inventory| %>
+            <% item_count = inventory.items_count.to_i %>
+            <tr class="data-table__row" data-row-link data-filter-text="<%= [inventory.title, inventory.description, inventory.owner&.name, inventory.owner&.email, inventory.category&.name].compact.join(' ').downcase %>">
+              <td>
+                <a class="table-primary" href="<%= inventory_path(inventory) %>"><%= inventory.title %></a>
+                <% if inventory.category %><span class="table-secondary"><%= inventory.category.name %></span><% end %>
+              </td>
+              <td class="table-description"><%= inventory.description.presence || t("common.no_description", default: "No description") %></td>
+              <td><span class="number-cell"><%= number_with_delimiter(item_count.to_i) %></span></td>
+              <td><a class="table-link" href="<%= user_path(inventory.owner) %>"><%= inventory.owner&.name.presence || inventory.owner&.email.presence || t("common.unknown", default: "Unknown") %></a></td>
+              <td>
+                <span class="status-pill <%= inventory.is_public? ? 'status-pill--public' : 'status-pill--private' %>">
+                  <span class="status-pill__dot" aria-hidden="true"></span>
+                  <%= inventory.is_public? ? t("common.shared", default: "Shared") : t("common.private", default: "Private") %>
+                </span>
+              </td>
+              <td class="table-arrow" aria-hidden="true">›</td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+    <div class="empty-state" data-filter-empty hidden>
+      <div class="empty-state__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m15.5 15.5 4 4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+      </div>
+      <h3><%= t("inventories.no_matches", default: "No matching inventories") %></h3>
+      <p><%= t("inventories.clear_filters", default: "Clear the filters to see the full collection again.") %></p>
+    </div>
+  <% else %>
+    <%= render "shared/empty_state",
+              title: t("inventories.empty", default: "No inventories yet"),
+              description: user_signed_in? ? t("inventories.empty_signed_in", default: "Create the first one and start adding useful fields.") : t("inventories.empty_guest", default: "There are no inventories to show right now."),
+              icon: "empty",
+              action_label: user_signed_in? ? t("inventories.create", default: "Create inventory") : nil,
+              action_path: user_signed_in? ? new_inventory_path : nil %>
+  <% end %>
+</section>

@@ -1,0 +1,75 @@
+<% inventory = @inventory || local_assigns[:inventory] %>
+<% comments = @comments || inventory.comments.order(:created_at) %>
+<% content_for :title, t("comments.title", default: "Discussion · %{inventory} · Stockroom", inventory: inventory.title) %>
+
+<header class="page-header">
+  <div class="page-header__copy">
+    <a class="table-link" href="<%= inventory_path(inventory) %>"><%= t("common.back_to_inventory", default: "← Back to %{inventory}", inventory: inventory.title) %></a>
+    <h1><%= t("comments.heading", default: "Discussion") %></h1>
+    <p><%= t("comments.description", default: "Share context, ask questions, and keep an ongoing record for the whole team.") %></p>
+  </div>
+  <span class="toolbar__label"><%= pluralize(comments.size, t("common.post_count", default: "post"), plural: t("common.post_count_plural", default: "posts")) %></span>
+</header>
+
+<%= render "inventories/tabs", inventory: inventory, active_tab: "discussion" %>
+
+<div class="discussion-layout">
+  <div class="discussion-stack">
+    <section class="discussion-feed" id="comments" data-discussion-feed data-discussion-poll-url="<%= inventory_comments_path(inventory) %>" aria-live="polite" aria-busy="false">
+      <% if comments.any? %>
+        <% comments.each do |comment| %><%= render "comment", comment: comment %><% end %>
+      <% else %>
+        <div class="panel empty-state" data-discussion-empty>
+          <div class="empty-state__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M5 5h14v10H9l-4 4V5Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8 9h8M8 12h5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+          </div>
+          <h3><%= t("comments.start", default: "Start the conversation") %></h3>
+          <p><%= t("comments.start_description", default: "Posts appear in order and update automatically for everyone viewing this inventory.") %></p>
+        </div>
+      <% end %>
+    </section>
+
+    <% if can_comment?(inventory) %>
+      <section class="panel discussion-composer">
+        <header class="panel__header">
+          <div>
+            <h2><%= t("comments.add_post", default: "Add a post") %></h2>
+            <p class="section-copy"><%= t("comments.markdown_supported", default: "Markdown formatting is supported.") %></p>
+          </div>
+        </header>
+        <div class="panel__body">
+          <%= form_with url: inventory_comments_path(inventory), method: :post, scope: :comment, data: { comment_form: true } do |form| %>
+            <div class="markdown-toolbar" role="toolbar" aria-label="<%= t("comments.markdown_toolbar", default: "Markdown formatting") %>">
+              <button type="button" data-markdown="bold" aria-label="<%= t("comments.bold", default: "Bold") %>"><strong>B</strong></button>
+              <button type="button" data-markdown="italic" aria-label="<%= t("comments.italic", default: "Italic") %>"><em>I</em></button>
+              <button type="button" data-markdown="link" aria-label="<%= t("comments.link", default: "Link") %>">↗</button>
+              <button type="button" data-markdown="code" aria-label="<%= t("comments.code", default: "Code") %>">&lt;/&gt;</button>
+            </div>
+            <%= form.text_area :body, class: "form-control", required: true, rows: 5, placeholder: t("comments.placeholder", default: "Write a thoughtful update…"), data: { markdown_editor: true } %>
+            <div class="discussion-composer__footer">
+              <span class="form-hint"><%= t("comments.markdown_hint", default: "Use Markdown for links, emphasis, and lists.") %></span>
+              <%= form.submit t("comments.submit", default: "Post comment"), class: "button button--primary" %>
+            </div>
+          <% end %>
+        </div>
+      </section>
+    <% else %>
+      <section class="panel panel__body">
+        <strong><%= t("comments.sign_in_to_comment", default: "Sign in to join the discussion.") %></strong>
+        <p class="section-copy"><a href="<%= sign_in_path %>"><%= t("common.sign_in", default: "Sign in") %></a> <%= t("comments.sign_in_hint", default: "to post a comment. Everyone can read the conversation.") %></p>
+      </section>
+    <% end %>
+  </div>
+
+  <aside class="side-stack">
+    <section class="side-card">
+      <h3><%= t("comments.about", default: "About this discussion") %></h3>
+      <p class="section-copy"><%= t("comments.linear_description", default: "Posts are linear and cannot be inserted between existing messages. New posts appear at the end.") %></p>
+    </section>
+    <section class="side-card">
+      <h3><%= t("comments.live_heading", default: "Live updates") %></h3>
+      <p class="section-copy"><%= t("comments.live_description", default: "This conversation refreshes every few seconds while you keep this tab open.") %></p>
+      <span class="autosave-status" data-discussion-status data-updated-message="<%= t("comments.updated", default: "Updated just now") %>"><%= t("comments.live", default: "Live") %></span>
+    </section>
+  </aside>
+</div>

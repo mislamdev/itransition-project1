@@ -1,0 +1,23 @@
+<% content_for :title, t("inventories.new_title", default: "New inventory · Stockroom") %>
+
+<div class="item-form-shell">
+  <header class="page-header">
+    <div class="page-header__copy">
+      <a class="table-link" href="<%= inventories_path %>"><%= t("common.back_to_all", default: "← All inventories") %></a>
+      <h1><%= t("inventories.create_heading", default: "Create an inventory") %></h1>
+      <p><%= t("inventories.create_description", default: "Start with the essentials. You can add custom fields, access rules, and an ID format next.") %></p>
+    </div>
+  </header>
+
+  <section class="panel">
+    <header class="panel__header">
+      <div>
+        <h2><%= t("inventories.details_heading", default: "Inventory details") %></h2>
+        <p class="section-copy"><%= t("inventories.details_description", default: "Give this collection a clear purpose.") %></p>
+      </div>
+    </header>
+    <div class="panel__body">
+      <%= render "form", inventory: (@inventory || Inventory.new), categories: (@categories || []) %>
+    </div>
+  </section>
+</div>

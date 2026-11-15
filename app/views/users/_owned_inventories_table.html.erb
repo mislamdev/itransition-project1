@@ -1,0 +1,48 @@
+<% user = local_assigns.fetch(:user) %>
+<% inventories = local_assigns.fetch(:inventories, []) %>
+<% manageable = local_assigns.fetch(:manageable, false) %>
+<% table_id = local_assigns.fetch(:table_id, "owned-inventories-table") %>
+
+<% if inventories.any? %>
+  <div class="table-wrap">
+    <table class="data-table" id="<%= table_id %>">
+      <caption class="sr-only"><%= t("users.owned_caption", default: "Inventories owned by %{user}", user: user.name.presence || user.email) %></caption>
+      <thead>
+        <tr>
+          <% if manageable %><th scope="col"><span class="sr-only"><%= t("common.select", default: "Select") %></span></th><% end %>
+          <th scope="col"><%= t("common.inventory", default: "Inventory") %></th>
+          <th scope="col"><%= t("common.items", default: "Items") %></th>
+          <th scope="col"><%= t("common.visibility", default: "Visibility") %></th>
+          <th scope="col"><%= t("common.created", default: "Created") %></th>
+          <th scope="col"><span class="sr-only"><%= t("common.open_inventory", default: "Open inventory") %></span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% inventories.each do |inventory| %>
+          <tr data-row-link data-filter-text="<%= [inventory.title, inventory.description, inventory.category&.name].compact.join(" ").downcase %>" data-inventory-edit-path="<%= edit_inventory_path(inventory) %>" data-inventory-delete-path="<%= inventory_path(inventory) %>">
+            <% if manageable %>
+              <td>
+                <label class="sr-only" for="<%= table_id %>-select-<%= inventory.id %>"><%= t("users.select_inventory", default: "Select %{title}", title: inventory.title) %></label>
+                <input id="<%= table_id %>-select-<%= inventory.id %>" type="checkbox" value="<%= inventory.id %>" data-owned-inventory-select>
+              </td>
+            <% end %>
+            <td>
+              <a class="table-primary" href="<%= inventory_path(inventory) %>"><%= inventory.title %></a>
+              <span class="table-secondary"><%= inventory.description.truncate(90) if inventory.description.present? %></span>
+            </td>
+            <td><span class="number-cell"><%= number_with_delimiter(inventory.items_count.to_i) %></span></td>
+            <td><span class="status-pill <%= inventory.is_public? ? 'status-pill--public' : 'status-pill--private' %>"><%= inventory.is_public? ? t("common.shared", default: "Shared") : t("common.private", default: "Private") %></span></td>
+            <td><span class="table-secondary"><%= inventory.created_at&.strftime("%b %-d, %Y") %></span></td>
+            <td class="table-arrow" aria-hidden="true">›</td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+  <div class="empty-state" data-filter-empty hidden>
+    <h3><%= t("users.no_matches", default: "No matching inventories") %></h3>
+    <p><%= t("users.clear_filters", default: "Clear the filter to see the complete list.") %></p>
+  </div>
+<% else %>
+  <%= render "shared/empty_state", title: t("users.no_owned", default: "No owned inventories"), description: t("users.no_owned_description", default: "Inventories created by this user will appear here."), icon: "empty" %>
+<% end %>

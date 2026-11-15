@@ -1,0 +1,24 @@
+<% inventory = @inventory || local_assigns[:inventory] %>
+<% content_for :title, t("items.new_title", default: "New item · %{inventory} · Stockroom", inventory: inventory.title) %>
+
+<div class="item-form-shell">
+  <header class="page-header">
+    <div class="page-header__copy">
+      <a class="table-link" href="<%= inventory_path(inventory) %>"><%= t("common.back_to_inventory", default: "← Back to %{inventory}", inventory: inventory.title) %></a>
+      <h1><%= t("items.add_heading", default: "Add an item") %></h1>
+      <p><%= t("items.add_description", default: "Enter the custom ID and the information this inventory collects.") %></p>
+    </div>
+  </header>
+
+  <section class="panel">
+    <header class="panel__header">
+      <div>
+        <h2><%= t("items.details_heading", default: "Item details") %></h2>
+        <p class="section-copy"><%= t("items.owner_fields_description", default: "Fields marked by the inventory owner appear here.") %></p>
+      </div>
+    </header>
+    <div class="panel__body">
+      <%= render "form", item: (@item || Item.new(inventory: inventory)), inventory: inventory %>
+    </div>
+  </section>
+</div>

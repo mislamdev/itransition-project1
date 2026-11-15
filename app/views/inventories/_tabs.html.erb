@@ -1,0 +1,22 @@
+<% inventory = local_assigns.fetch(:inventory) %>
+<% active_tab = local_assigns.fetch(:active_tab, "items") %>
+<% can_manage = can_edit_inventory?(inventory) %>
+
+<nav class="inventory-tabs" aria-label="<%= t("inventories.tabs.label", default: "Inventory sections") %>">
+  <a class="inventory-tab <%= 'is-active' if active_tab == 'items' %>" href="<%= inventory_path(inventory) %>">
+    <%= t("inventories.tabs.items", default: "Items") %>
+    <span class="tab-count"><%= inventory.items_count.to_i %></span>
+  </a>
+  <a class="inventory-tab <%= 'is-active' if active_tab == 'discussion' %>" href="<%= inventory_comments_path(inventory) %>">
+    <%= t("inventories.tabs.discussion", default: "Discussion") %>
+    <span class="tab-count"><%= inventory.comments.count %></span>
+  </a>
+
+  <% if can_manage %>
+    <a class="inventory-tab <%= 'is-active' if active_tab == 'settings' %>" href="<%= edit_inventory_path(inventory) %>"><%= t("inventories.tabs.settings", default: "Settings") %></a>
+    <a class="inventory-tab <%= 'is-active' if active_tab == 'fields' %>" href="<%= inventory_fields_path(inventory) %>"><%= t("inventories.tabs.fields", default: "Fields") %></a>
+    <a class="inventory-tab <%= 'is-active' if active_tab == 'custom_id' %>" href="<%= edit_inventory_custom_id_path(inventory) %>"><%= t("inventories.tabs.custom_id", default: "Custom ID") %></a>
+    <a class="inventory-tab <%= 'is-active' if active_tab == 'access' %>" href="<%= inventory_accesses_path(inventory) %>"><%= t("inventories.tabs.access", default: "Access") %></a>
+    <a class="inventory-tab <%= 'is-active' if active_tab == 'statistics' %>" href="<%= statistics_inventory_path(inventory) %>"><%= t("inventories.tabs.statistics", default: "Statistics") %></a>
+  <% end %>
+</nav>

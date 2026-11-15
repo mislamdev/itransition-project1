@@ -1,0 +1,39 @@
+<% inventories = local_assigns.fetch(:inventories, []) %>
+<% table_id = local_assigns.fetch(:table_id, "writable-inventories-table") %>
+
+<% if inventories.any? %>
+  <div class="table-wrap">
+    <table class="data-table" id="<%= table_id %>">
+      <caption class="sr-only"><%= t("users.shared_caption", default: "Inventories this user can contribute to") %></caption>
+      <thead>
+        <tr>
+          <th scope="col"><%= t("common.inventory", default: "Inventory") %></th>
+          <th scope="col"><%= t("common.owner", default: "Owner") %></th>
+          <th scope="col"><%= t("common.items", default: "Items") %></th>
+          <th scope="col"><%= t("common.visibility", default: "Visibility") %></th>
+          <th scope="col"><span class="sr-only"><%= t("common.open_inventory", default: "Open inventory") %></span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% inventories.each do |inventory| %>
+          <tr class="data-table__row" data-row-link data-filter-text="<%= [inventory.title, inventory.description, inventory.owner&.name, inventory.owner&.email].compact.join(" ").downcase %>">
+            <td>
+              <a class="table-primary" href="<%= inventory_path(inventory) %>"><%= inventory.title %></a>
+              <span class="table-secondary"><%= inventory.description.truncate(90) if inventory.description.present? %></span>
+            </td>
+            <td><a class="table-link" href="<%= user_path(inventory.owner) %>"><%= inventory.owner&.name.presence || inventory.owner&.email.presence || t("common.unknown", default: "Unknown") %></a></td>
+            <td><span class="number-cell"><%= number_with_delimiter(inventory.items_count.to_i) %></span></td>
+            <td><span class="status-pill <%= inventory.is_public? ? 'status-pill--public' : 'status-pill--private' %>"><%= inventory.is_public? ? t("common.shared", default: "Shared") : t("common.private", default: "Private") %></span></td>
+            <td class="table-arrow" aria-hidden="true">›</td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+  <div class="empty-state" data-filter-empty hidden>
+    <h3><%= t("users.no_matches", default: "No matching inventories") %></h3>
+    <p><%= t("users.clear_shared_filters", default: "Clear the filter to see every shared inventory.") %></p>
+  </div>
+<% else %>
+  <%= render "shared/empty_state", title: t("users.no_shared", default: "No shared inventories"), description: t("users.no_shared_description", default: "Inventories where this user has write access will appear here."), icon: "empty" %>
+<% end %>

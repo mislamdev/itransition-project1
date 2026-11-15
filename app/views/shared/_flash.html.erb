@@ -1,0 +1,13 @@
+<% flash_messages = flash.to_hash %>
+<% if flash_messages.any? %>
+  <div class="flash-stack" aria-live="polite" aria-atomic="true">
+    <% flash_messages.each do |type, message| %>
+      <% next if message.blank? %>
+      <div class="flash flash--<%= type.to_s == 'alert' ? 'danger' : 'success' %>" role="status">
+        <span class="flash__dot" aria-hidden="true"></span>
+        <p><%= message %></p>
+        <button class="flash__close" type="button" data-dismiss-flash aria-label="Dismiss notification">×</button>
+      </div>
+    <% end %>
+  </div>
+<% end %>

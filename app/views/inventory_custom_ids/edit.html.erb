@@ -1,0 +1,150 @@
+<% inventory = @inventory || local_assigns[:inventory] %>
+<% elements = @elements || [] %>
+<% content_for :title, "Custom ID · #{inventory.title} · Stockroom" %>
+
+<header class="page-header">
+  <div class="page-header__copy">
+    <a class="table-link" href="<%= inventory_path(inventory) %>">← Back to <%= inventory.title %></a>
+    <h1><%= t("custom_id.heading", default: "Custom inventory ID") %></h1>
+    <p><%= t("custom_id.description", default: "Build the format used for new item IDs. Existing IDs stay unchanged when the format changes.") %></p>
+  </div>
+</header>
+
+<%= render "inventories/tabs", inventory: inventory, active_tab: "custom_id" %>
+
+<div class="id-builder-layout">
+  <section class="panel" aria-labelledby="id-builder-heading">
+    <header class="panel__header">
+      <div>
+        <h2 id="id-builder-heading"><%= t("custom_id.format_heading", default: "ID format") %></h2>
+        <p class="section-copy"><%= t("custom_id.format_description", default: "Arrange up to ten elements. Drag to reorder or use the focused-card controls.") %></p>
+      </div>
+      <button class="button button--ghost button--small" type="button" data-id-move="up" disabled><%= t("common.move_up", default: "Move up") %></button>
+      <button class="button button--ghost button--small" type="button" data-id-move="down" disabled><%= t("common.move_down", default: "Move down") %></button>
+    </header>
+
+    <div class="panel__body">
+      <%= form_with url: inventory_custom_id_path(inventory), method: :patch,
+                    data: {
+                      id_format_form: true,
+                      preview_url: preview_inventory_custom_id_path(inventory),
+                      preview_updating_message: t("custom_id.preview_updating", default: "Updating preview…"),
+                      preview_unavailable_message: t("custom_id.preview_unavailable", default: "Preview unavailable"),
+                      generated_label: t("custom_id.generated", default: "Generated"),
+                      plain_label: t("custom_id.plain", default: "plain"),
+                      remove_label: t("custom_id.remove", default: "Remove element"),
+                      max_elements_message: t("custom_id.max_elements", default: "An ID format can contain up to ten elements.")
+                    } do |form| %>
+        <div class="id-element-list <%= 'is-empty' if elements.empty? %>" data-id-element-list>
+          <% elements.each_with_index do |element, index| %>
+            <% options = element.options.is_a?(Hash) ? element.options : {} %>
+            <div class="id-element" draggable="true" tabindex="0" data-id-element data-element-id="<%= element.id %>">
+              <span class="drag-handle" aria-hidden="true" title="Drag to reorder">⠿</span>
+              <%= hidden_field_tag "elements[#{index}][id]", element.id, id: nil %>
+              <div class="input-with-help">
+                <select class="form-select" name="elements[#{index}][kind]" aria-label="Element type" data-id-kind>
+                  <% %w[fixed random_20 random_32 random_6 random_9 guid datetime sequence].each do |kind| %>
+                    <option value="<%= kind %>" <%= 'selected' if element.kind == kind %>><%= t("custom_id.kinds.#{kind}", default: kind.tr("_", " ").capitalize) %></option>
+                  <% end %>
+                </select>
+                <button class="help-button" type="button" data-bs-toggle="popover" data-bs-placement="top"
+                        data-bs-title="<%= t("custom_id.element_help_title", default: "About this element") %>"
+                        data-bs-content="<%= t("custom_id.help.#{element.kind}", default: "Choose the kind of value this element contributes to the ID.") %>"
+                        aria-label="<%= t("custom_id.help_button", default: "Show help for this element type") %>">?</button>
+              </div>
+
+              <div class="id-element__options">
+                <% if element.kind == "fixed" %>
+                  <div class="input-with-help">
+                    <input class="form-control" name="elements[#{index}][text]" value="<%= element.text %>" placeholder="Fixed text" aria-label="Fixed text" data-id-text>
+                    <button class="help-button" type="button" data-bs-toggle="popover" data-bs-placement="top"
+                            data-bs-title="<%= t("custom_id.kinds.fixed", default: "Fixed text") %>"
+                            data-bs-content="<%= t("custom_id.help.fixed", default: "Any Unicode text, such as LAB- or 2026/") %>"
+                            aria-label="<%= t("custom_id.help_button", default: "Show help for this element type") %>">?</button>
+                  </div>
+                <% elsif element.kind == "guid" %>
+                  <div class="input-with-help">
+                    <select class="form-select" name="elements[#{index}][options][format]" aria-label="GUID format" data-id-option>
+                      <option value="hyphenated" <%= 'selected' if options["format"] != "compact" %>>8-4-4-4-12</option>
+                      <option value="compact" <%= 'selected' if options["format"] == "compact" %>>32 hex characters</option>
+                    </select>
+                    <button class="help-button" type="button" data-bs-toggle="popover" data-bs-placement="top"
+                            data-bs-title="<%= t("custom_id.guid_format", default: "GUID format") %>"
+                            data-bs-content="<%= t("custom_id.help.guid_format", default: "Hyphenated uses 8-4-4-4-12; compact uses 32 hexadecimal characters.") %>"
+                            aria-label="<%= t("custom_id.help_button", default: "Show help for this element type") %>">?</button>
+                  </div>
+                <% elsif element.kind == "datetime" %>
+                  <div class="input-with-help">
+                    <input class="form-control" name="elements[#{index}][options][format]" value="<%= options.fetch("format", "%Y%m%d") %>" aria-label="Date format" data-id-option>
+                    <button class="help-button" type="button" data-bs-toggle="popover" data-bs-placement="top"
+                            data-bs-title="<%= t("custom_id.datetime_format", default: "Date format") %>"
+                            data-bs-content="<%= t("custom_id.help.datetime_format", default: "Use a strftime pattern, for example %Y%m%d for 20261115.") %>"
+                            aria-label="<%= t("custom_id.help_button", default: "Show help for this element type") %>">?</button>
+                  </div>
+                <% else %>
+                  <div class="input-with-help">
+                    <input class="form-control" type="number" min="1" max="20" name="elements[#{index}][options][padding]" value="<%= options["padding"] %>" placeholder="Padding" aria-label="Number padding" data-id-option>
+                    <button class="help-button" type="button" data-bs-toggle="popover" data-bs-placement="top"
+                            data-bs-title="<%= t("custom_id.padding", default: "Leading-zero padding") %>"
+                            data-bs-content="<%= t("custom_id.help.padding", default: "Numeric padding adds leading zeroes, for example 0007.") %>"
+                            aria-label="<%= t("custom_id.help_button", default: "Show help for this element type") %>">?</button>
+                  </div>
+                <% end %>
+              </div>
+
+              <div class="id-element__format">
+                <% if element.kind == "datetime" %>
+                  <span class="status-pill status-pill--info"><%= options.fetch("format", "%Y%m%d") %></span>
+                <% elsif element.kind.start_with?("random") || element.kind == "sequence" %>
+                  <span class="status-pill status-pill--info"><%= options["padding"].presence || "plain" %></span>
+                <% else %>
+                  <span class="status-pill status-pill--private"><%= t("custom_id.generated", default: "Generated") %></span>
+                <% end %>
+              </div>
+
+              <button class="field-card__delete" type="button" data-id-remove aria-label="<%= t("custom_id.remove", default: "Remove element") %>">×</button>
+            </div>
+          <% end %>
+        </div>
+
+        <div class="id-palette" aria-label="Add ID element">
+          <% { fixed: "Fixed text", random_20: "20-bit random", random_32: "32-bit random", random_6: "6-digit random", random_9: "9-digit random", guid: "GUID", datetime: "Date / time", sequence: "Sequence" }.each do |kind, label| %>
+            <button class="id-palette__button" type="button"
+                    data-add-id-kind="<%= kind %>"
+                    data-label="<%= t("custom_id.kinds.#{kind}", default: label) %>"
+                    data-help="<%= t("custom_id.help.#{kind}", default: "This element contributes a generated value to the inventory ID.") %>"><%= t("custom_id.kinds.#{kind}", default: label) %></button>
+          <% end %>
+        </div>
+
+        <div class="form-actions">
+          <a class="button button--ghost" href="<%= inventory_path(inventory) %>"><%= t("common.cancel", default: "Cancel") %></a>
+          <%= form.submit t("custom_id.save", default: "Save ID format"), class: "button button--primary" %>
+        </div>
+      <% end %>
+    </div>
+  </section>
+
+  <aside class="id-preview-card" aria-live="polite">
+    <span class="eyebrow"><%= t("custom_id.preview_label", default: "Live preview") %></span>
+    <h3><%= t("custom_id.preview_heading", default: "Your next item ID") %></h3>
+    <p><%= t("custom_id.preview_help", default: "The server renders this with the same rules used when an item is created.") %></p>
+    <code class="id-preview" data-id-preview><%= @preview.presence || "—" %></code>
+    <p class="id-preview-meta" data-id-preview-meta><%= @format.presence || t("custom_id.preview_waiting", default: "Waiting for a format…") %></p>
+
+    <hr class="divider">
+    <details>
+      <summary class="table-primary"><%= t("custom_id.help_title", default: "Formatting help") %></summary>
+      <div class="section-copy" style="margin-top: 10px;">
+        <p><strong><%= t("custom_id.kinds.fixed", default: "Fixed text") %>:</strong> <%= t("custom_id.help.fixed", default: "Any Unicode text, such as LAB- or 2026/") %>.</p>
+        <p><strong><%= t("custom_id.kinds.random_20", default: "20-bit random") %>:</strong> <%= t("custom_id.help.random_20", default: "A number from 0 to 1,048,575.") %></p>
+        <p><strong><%= t("custom_id.kinds.random_32", default: "32-bit random") %>:</strong> <%= t("custom_id.help.random_32", default: "A number from 0 to 4,294,967,295.") %></p>
+        <p><strong><%= t("custom_id.kinds.random_6", default: "6-digit random") %>:</strong> <%= t("custom_id.help.random_6", default: "A number from 0 to 999,999.") %></p>
+        <p><strong><%= t("custom_id.kinds.random_9", default: "9-digit random") %>:</strong> <%= t("custom_id.help.random_9", default: "A number from 0 to 999,999,999.") %></p>
+        <p><strong><%= t("custom_id.kinds.guid", default: "GUID") %>:</strong> <%= t("custom_id.help.guid", default: "A globally unique identifier in hyphenated or compact form.") %></p>
+        <p><strong><%= t("custom_id.kinds.datetime", default: "Date / time") %>:</strong> <%= t("custom_id.help.datetime", default: "The creation time, formatted with a strftime pattern such as %Y%m%d.") %></p>
+        <p><strong><%= t("custom_id.kinds.sequence", default: "Sequence") %>:</strong> <%= t("custom_id.help.sequence", default: "The next number after the largest sequence already used in this inventory.") %></p>
+        <p><%= t("custom_id.help.padding", default: "Numeric padding adds leading zeroes, for example 0007.") %></p>
+      </div>
+    </details>
+  </aside>
+</div>

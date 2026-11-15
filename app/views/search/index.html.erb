@@ -1,0 +1,109 @@
+<% query = @query || params[:q].to_s %>
+<% inventory_results = @inventories || [] %>
+<% item_results = @items || [] %>
+<% user_results = @users || [] %>
+<% total_results = inventory_results.size + item_results.size + user_results.size %>
+<% content_for :title, query.present? ? "#{query} · #{t("search.title", default: "Search")} · Stockroom" : t("search.title", default: "Search · Stockroom") %>
+
+<header class="page-header">
+  <div class="page-header__copy">
+    <span class="eyebrow"><%= t("search.eyebrow", default: "Full-text search") %></span>
+    <h1><%= query.present? ? t("search.results_for", default: "Results for “%{query}”", query: query) : t("search.heading", default: "Search Stockroom") %></h1>
+    <p class="search-summary"><strong><%= number_with_delimiter(total_results) %></strong> <%= t("search.results_found", default: "results across inventories, items, and people.") %></p>
+  </div>
+</header>
+
+<% if query.blank? %>
+  <section class="panel">
+    <div class="panel__body">
+      <%= form_with url: search_path, method: :get, role: "search" do |form| %>
+        <label class="form-label" for="search-page-input"><%= t("search.input_label", default: "Search everything") %></label>
+        <div class="button-group">
+          <%= form.search_field :q, id: "search-page-input", class: "form-control", placeholder: t("search.placeholder", default: "Try a title, item ID, field value, or person…"), autofocus: true %>
+          <%= form.submit t("search.submit", default: "Search"), class: "button button--primary" %>
+        </div>
+      <% end %>
+    </div>
+  </section>
+<% elsif total_results.zero? %>
+  <section class="panel">
+    <%= render "shared/empty_state", title: t("search.no_results", default: "No results found"), description: t("search.no_results_help", default: "Check the spelling or search for a broader term."), icon: "search" %>
+  </section>
+<% else %>
+  <nav class="result-tabs" aria-label="<%= t("search.categories", default: "Search result categories") %>">
+    <span class="result-tab is-active"><%= t("search.all_results", default: "All") %> (<%= total_results %>)</span>
+    <% if inventory_results.any? %><span class="result-tab"><%= t("search.inventories", default: "Inventories") %> (<%= inventory_results.size %>)</span><% end %>
+    <% if item_results.any? %><span class="result-tab"><%= t("search.items", default: "Items") %> (<%= item_results.size %>)</span><% end %>
+    <% if user_results.any? %><span class="result-tab"><%= t("search.people", default: "People") %> (<%= user_results.size %>)</span><% end %>
+  </nav>
+
+  <div class="dashboard-stack">
+    <% if inventory_results.any? %>
+      <section class="panel" aria-labelledby="search-inventories-heading">
+        <header class="panel__header"><h2 id="search-inventories-heading"><%= t("search.inventories", default: "Inventories") %></h2></header>
+        <div class="table-wrap">
+          <table class="data-table">
+            <caption class="sr-only"><%= t("search.inventory_caption", default: "Inventories matching %{query}", query: query) %></caption>
+            <thead><tr><th scope="col"><%= t("common.inventory", default: "Inventory") %></th><th scope="col"><%= t("common.description", default: "Description") %></th><th scope="col"><%= t("common.owner", default: "Owner") %></th><th scope="col"><%= t("common.items", default: "Items") %></th><th scope="col"><span class="sr-only"><%= t("common.open", default: "Open") %></span></th></tr></thead>
+            <tbody>
+              <% inventory_results.each do |inventory| %>
+                <tr class="data-table__row" data-row-link>
+                  <td><a class="table-primary" href="<%= inventory_path(inventory) %>"><%= inventory.title %></a><span class="table-secondary"><%= inventory.category&.name %></span></td>
+                  <td class="table-description"><%= inventory.description.presence || t("common.no_description", default: "No description") %></td>
+                  <td><a class="table-link" href="<%= user_path(inventory.owner) %>"><%= inventory.owner&.name.presence || inventory.owner&.email.presence || t("common.unknown", default: "Unknown") %></a></td>
+                  <td><span class="number-cell"><%= number_with_delimiter(inventory.items_count.to_i) %></span></td>
+                  <td class="table-arrow" aria-hidden="true">›</td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    <% end %>
+
+    <% if item_results.any? %>
+      <section class="panel" aria-labelledby="search-items-heading">
+        <header class="panel__header"><h2 id="search-items-heading"><%= t("search.items", default: "Items") %></h2></header>
+        <div class="table-wrap">
+          <table class="data-table">
+            <caption class="sr-only"><%= t("search.item_caption", default: "Items matching %{query}", query: query) %></caption>
+            <thead><tr><th scope="col"><%= t("items.custom_id", default: "Custom ID") %></th><th scope="col"><%= t("common.inventory", default: "Inventory") %></th><th scope="col"><%= t("common.created", default: "Created") %></th><th scope="col"><%= t("common.likes", default: "Likes") %></th><th scope="col"><span class="sr-only"><%= t("common.open", default: "Open") %></span></th></tr></thead>
+            <tbody>
+              <% item_results.each do |item| %>
+                <tr class="data-table__row" data-row-link>
+                  <td><a class="item-id" href="<%= item_path(item) %>"><%= item.custom_id %></a></td>
+                  <td><a class="table-primary" href="<%= inventory_path(item.inventory) %>"><%= item.inventory.title %></a></td>
+                  <td><span class="table-secondary"><%= item.created_at&.strftime("%b %-d, %Y") %></span></td>
+                  <td><span class="likes-count"><span class="likes-count__icon">♥</span><%= item.likes_count.to_i %></span></td>
+                  <td class="table-arrow" aria-hidden="true">›</td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    <% end %>
+
+    <% if user_results.any? %>
+      <section class="panel" aria-labelledby="search-people-heading">
+        <header class="panel__header"><h2 id="search-people-heading"><%= t("search.people", default: "People") %></h2></header>
+        <div class="table-wrap">
+          <table class="data-table">
+            <caption class="sr-only"><%= t("search.people_caption", default: "People matching %{query}", query: query) %></caption>
+            <thead><tr><th scope="col"><%= t("common.name", default: "Name") %></th><th scope="col"><%= t("common.email", default: "Email") %></th><th scope="col"><%= t("common.joined", default: "Joined") %></th><th scope="col"><span class="sr-only"><%= t("common.open", default: "Open") %></span></th></tr></thead>
+            <tbody>
+              <% user_results.each do |person| %>
+                <tr class="data-table__row" data-row-link>
+                  <td><a class="table-primary" href="<%= user_path(person) %>"><%= person.name.presence || person.email.split("@").first %></a></td>
+                  <td><%= person.email %></td>
+                  <td><span class="table-secondary"><%= person.created_at&.strftime("%b %-d, %Y") %></span></td>
+                  <td class="table-arrow" aria-hidden="true">›</td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    <% end %>
+  </div>
+<% end %>

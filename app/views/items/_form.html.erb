@@ -1,0 +1,73 @@
+<% item = local_assigns.fetch(:item) %>
+<% inventory = local_assigns.fetch(:inventory, item.inventory) %>
+<% persisted = item.persisted? %>
+<% item_fields = @fields || inventory.fields.to_a %>
+
+<%= form_with url: (persisted ? item_path(item) : inventory_items_path(inventory)),
+              method: (persisted ? :patch : :post),
+              scope: :item,
+              data: { item_form: true } do |form| %>
+  <%= form.hidden_field :lock_version, value: item.lock_version if persisted %>
+
+  <div class="form-grid">
+    <div class="form-field form-field--wide">
+      <%= form.label :custom_id, t("items.form.custom_id", default: "Custom inventory ID"), class: "form-label" %>
+      <%= form.text_field :custom_id, class: "form-control", required: true, autocomplete: "off", spellcheck: false, placeholder: t("items.form.custom_id_placeholder", default: "e.g. INV-0007") %>
+      <p class="form-hint"><%= t("items.form.custom_id_hint", default: "The inventory’s current ID rules apply. IDs remain unique inside this inventory.") %></p>
+    </div>
+
+    <% if persisted %>
+      <div class="form-field">
+        <%= form.label :created_by, t("items.form.created_by", default: "Created by"), class: "form-label" %>
+        <%= form.text_field :created_by, value: item.created_by&.display_name, class: "form-control", readonly: true, aria: { readonly: true } %>
+      </div>
+      <div class="form-field">
+        <%= form.label :created_at, t("items.form.created_at", default: "Created at"), class: "form-label" %>
+        <%= form.text_field :created_at, value: item.created_at&.strftime("%B %-d, %Y at %H:%M"), class: "form-control", readonly: true, aria: { readonly: true } %>
+      </div>
+    <% end %>
+
+    <% item_fields.sort_by(&:position).each do |field| %>
+      <% value = item.values[field.id] %>
+      <div class="form-field <%= field.field_type == 'textarea' ? 'form-field--wide' : '' %>">
+        <%= label_tag "item_values_#{field.id}", field.title, class: "form-label" %>
+        <% if field.field_type == "textarea" %>
+          <%= text_area_tag "item[values][#{field.id}]", value, id: "item_values_#{field.id}", class: "form-control", rows: 5, placeholder: field.description.presence %>
+        <% elsif field.field_type == "number" %>
+          <%= number_field_tag "item[values][#{field.id}]", value, id: "item_values_#{field.id}", class: "form-control", step: "any", placeholder: field.description.presence %>
+        <% elsif field.field_type == "document" %>
+          <%= url_field_tag "item[values][#{field.id}]", value, id: "item_values_#{field.id}", class: "form-control", placeholder: "https://…", inputmode: "url" %>
+          <p class="form-hint"><%= field.description.presence || t("items.form.document_hint", default: "Link to a document or image.") %></p>
+        <% elsif field.field_type == "boolean" %>
+          <%= hidden_field_tag "item[values][#{field.id}]", "0", id: "item_values_#{field.id}_hidden" %>
+          <label class="check-control">
+            <%= check_box_tag "item[values][#{field.id}]", "1", value == true, id: "item_values_#{field.id}" %>
+            <span class="check-control__copy">
+              <strong><%= t("common.yes", default: "Yes") %></strong>
+              <span><%= field.description.presence || t("items.form.boolean_hint", default: "Select when this applies.") %></span>
+            </span>
+          </label>
+        <% elsif field.field_type == "select" %>
+          <% options = field.options.is_a?(Hash) ? Array(field.options["values"]) : Array(field.options) %>
+          <%= select_tag "item[values][#{field.id}]", options_for_select(options, value), id: "item_values_#{field.id}", class: "form-select", include_blank: t("items.form.choose", default: "Choose…") %>
+          <p class="form-hint"><%= field.description.presence %></p>
+        <% else %>
+          <%= text_field_tag "item[values][#{field.id}]", value, id: "item_values_#{field.id}", class: "form-control", placeholder: field.description.presence %>
+          <% if field.description.present? %><p class="form-hint"><%= field.description %></p><% end %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+  <% if item_fields.empty? %>
+    <div class="panel panel__body" style="margin-top: 20px;">
+      <strong><%= t("items.form.no_fields", default: "No custom fields yet.") %></strong>
+      <p class="section-copy"><%= t("items.form.no_fields_description", default: "The owner can add fields to collect structured information for every item.") %></p>
+    </div>
+  <% end %>
+
+  <div class="form-actions">
+    <%= link_to t("common.cancel", default: "Cancel"), persisted ? item_path(item) : inventory_path(inventory), class: "button button--ghost" %>
+    <%= form.submit(persisted ? t("items.form.save", default: "Save item") : t("items.form.add", default: "Add item"), class: "button button--primary") %>
+  </div>
+<% end %>

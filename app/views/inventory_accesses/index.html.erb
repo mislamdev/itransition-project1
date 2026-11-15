@@ -1,0 +1,134 @@
+<% inventory = @inventory || local_assigns[:inventory] %>
+<% accesses = @accesses || [] %>
+<% content_for :title, t("accesses.title", default: "Access · %{inventory} · Stockroom", inventory: inventory.title) %>
+
+<header class="page-header">
+  <div class="page-header__copy">
+    <a class="table-link" href="<%= inventory_path(inventory) %>"><%= t("common.back_to_inventory", default: "← Back to %{inventory}", inventory: inventory.title) %></a>
+    <h1><%= t("accesses.heading", default: "Access settings") %></h1>
+    <p><%= t("accesses.description", default: "Choose who can contribute items, or open the inventory to every signed-in member.") %></p>
+  </div>
+</header>
+
+<%= render "inventories/tabs", inventory: inventory, active_tab: "access" %>
+
+<div class="access-layout">
+  <section class="panel inventory-list-panel" aria-labelledby="access-list-heading">
+    <header class="filter-bar">
+      <div class="filter-bar__group">
+        <h2 id="access-list-heading" class="sr-only"><%= t("accesses.list_heading", default: "Users with write access") %></h2>
+        <label class="sr-only" for="access-filter"><%= t("accesses.filter_label", default: "Filter people") %></label>
+        <input id="access-filter" class="filter-input" type="search" placeholder="<%= t("accesses.filter_placeholder", default: "Filter people…") %>" autocomplete="off" data-table-filter="access-users-table">
+        <div class="sort-control" role="group" aria-label="<%= t("accesses.sort_label", default: "Sort people") %>">
+          <button type="button" class="is-active" data-access-sort="name"><%= t("accesses.sort_name", default: "Name") %></button>
+          <button type="button" data-access-sort="email"><%= t("accesses.sort_email", default: "Email") %></button>
+        </div>
+        <button class="button button--ghost button--small text-danger" type="button" data-remove-access disabled><%= t("accesses.remove_selected", default: "Remove selected") %></button>
+      </div>
+      <span class="toolbar__label"><%= pluralize(accesses.size, t("common.person_count", default: "person"), plural: t("common.person_count_plural", default: "people")) %></span>
+    </header>
+
+    <% if accesses.any? %>
+      <div class="table-wrap">
+        <table class="data-table" id="access-users-table">
+          <caption class="sr-only"><%= t("accesses.table_caption", default: "People granted write access to %{inventory}", inventory: inventory.title) %></caption>
+          <thead>
+            <tr>
+              <th scope="col"><span class="sr-only"><%= t("common.select", default: "Select") %></span></th>
+              <th scope="col"><%= t("accesses.person", default: "Person") %></th>
+              <th scope="col"><%= t("common.email", default: "Email") %></th>
+              <th scope="col"><%= t("accesses.access", default: "Access") %></th>
+            </tr>
+          </thead>
+          <tbody data-access-list>
+            <% accesses.each do |access| %>
+              <% person = access.respond_to?(:user) ? access.user : access %>
+              <% person_name = person.respond_to?(:name) ? person.name.presence : nil %>
+              <% person_email = person.respond_to?(:email) ? person.email : "" %>
+              <tr data-access-row data-name="<%= person_name.to_s.downcase %>" data-email="<%= person_email.to_s.downcase %>" data-access-path="<%= inventory_access_path(inventory, access) %>">
+                <td>
+                  <label class="sr-only" for="access-select-<%= access.id %>"><%= t("accesses.select", default: "Select %{name}", name: person_name || person_email) %></label>
+                  <input id="access-select-<%= access.id %>" type="checkbox" value="<%= access.id %>" data-access-select>
+                </td>
+                <td>
+                  <div class="user-cell">
+                    <span class="avatar" aria-hidden="true"><%= (person_name || person_email).to_s.first.to_s.upcase %></span>
+                    <span>
+                      <span class="user-cell__name"><%= person_name.presence || person_email.split("@").first %></span>
+                      <span class="user-cell__email"><%= t("accesses.registered_user", default: "Registered user") %></span>
+                    </span>
+                  </div>
+                </td>
+                <td><%= person_email %></td>
+                <td><span class="status-pill status-pill--public"><span class="status-pill__dot" aria-hidden="true"></span><%= t("accesses.can_edit", default: "Can edit") %></span></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+      <div class="empty-state" data-filter-empty hidden>
+        <div class="empty-state__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m15.5 15.5 4 4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+        </div>
+        <h3><%= t("accesses.no_matches", default: "No matching people") %></h3>
+        <p><%= t("accesses.clear_filters", default: "Clear the filter to see everyone with access.") %></p>
+      </div>
+    <% else %>
+      <%= render "shared/empty_state", title: t("accesses.empty", default: "No specific access yet"), description: t("accesses.empty_description", default: "Add people by name or email, or make the inventory public below."), icon: "empty" %>
+    <% end %>
+  </section>
+
+  <aside class="side-stack">
+    <section class="panel">
+      <header class="panel__header">
+        <div>
+          <h2><%= t("accesses.add_person", default: "Add a person") %></h2>
+          <p class="section-copy"><%= t("accesses.add_description", default: "Start typing either a name or email address.") %></p>
+        </div>
+      </header>
+      <div class="panel__body">
+        <%= form_with url: inventory_accesses_path(inventory), method: :post, data: { access_form: true } do |form| %>
+          <div class="form-field autocomplete">
+            <%= form.label :query, t("accesses.name_or_email", default: "Name or email"), class: "form-label" %>
+            <%= form.text_field :query, class: "form-control", required: true, autocomplete: "off", placeholder: t("accesses.search_placeholder", default: "Search registered people…"), data: { access_autocomplete: true, suggestions_url: suggestions_inventory_accesses_path(inventory) } %>
+            <%= form.hidden_field :user_id, data: { access_user_id: true } %>
+            <%= form.hidden_field :email, data: { access_email: true } %>
+            <div class="autocomplete__results" data-autocomplete-results hidden role="listbox" aria-label="<%= t("accesses.matches", default: "Matching people") %>"></div>
+            <p class="form-hint"><%= t("accesses.suggestions_hint", default: "Suggestions match both names and email addresses.") %></p>
+          </div>
+          <div class="form-actions">
+            <%= form.submit t("accesses.add", default: "Add person"), class: "button button--primary" %>
+          </div>
+        <% end %>
+      </div>
+    </section>
+
+    <section class="panel">
+      <header class="panel__header">
+        <div>
+          <h2><%= t("accesses.visibility", default: "Visibility") %></h2>
+          <p class="section-copy"><%= t("accesses.visibility_description", default: "Choose shared or restricted access.") %></p>
+        </div>
+      </header>
+      <div class="panel__body">
+        <%= form_with url: update_inventory_accesses_path(inventory), method: :patch, data: { public_access_form: true } do |form| %>
+          <%= form.hidden_field :lock_version, value: inventory.lock_version %>
+          <div class="switch-row">
+            <div>
+              <strong class="form-label mb-0"><%= t("accesses.public", default: "Public inventory") %></strong>
+              <p class="form-hint mt-1 mb-0"><%= t("accesses.public_hint", default: "Every signed-in user can add and edit items.") %></p>
+            </div>
+            <label class="switch">
+              <%= form.check_box :is_public, checked: inventory.is_public? %>
+              <span class="switch__track" aria-hidden="true"></span>
+              <span class="sr-only"><%= t("accesses.public_aria", default: "Make this inventory public") %></span>
+            </label>
+          </div>
+          <div class="form-actions">
+            <%= form.submit t("accesses.save_visibility", default: "Save visibility"), class: "button button--secondary" %>
+          </div>
+        <% end %>
+      </div>
+    </section>
+  </aside>
+</div>

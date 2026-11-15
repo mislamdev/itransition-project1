@@ -1,0 +1,108 @@
+<% inventory = @inventory || local_assigns[:inventory] %>
+<% statistics = @statistics || nil %>
+<% field_statistics = statistics.respond_to?(:fields) ? statistics.fields : [] %>
+<% numeric_statistics = field_statistics.select { |stat| stat[:type] == :number } %>
+<% boolean_statistics = field_statistics.select { |stat| stat[:type] == :boolean } %>
+<% value_statistics = field_statistics.select { |stat| stat[:type] == :text }.flat_map { |stat| Array(stat[:top_values]).map { |entry| { field: stat[:field], value: entry[:value], count: entry[:count] } } } %>
+<% maximum_value_count = value_statistics.map { |stat| stat[:count].to_i }.max.to_i %>
+<% content_for :title, t("statistics.title", default: "Statistics · %{inventory} · Stockroom", inventory: inventory.title) %>
+
+<header class="page-header">
+  <div class="page-header__copy">
+    <a class="table-link" href="<%= inventory_path(inventory) %>"><%= t("common.back_to_inventory", default: "← Back to %{inventory}", inventory: inventory.title) %></a>
+    <h1><%= t("statistics.heading", default: "Inventory statistics") %></h1>
+    <p><%= t("statistics.description", default: "A read-only summary of the values collected across every item.") %></p>
+  </div>
+</header>
+
+<%= render "inventories/tabs", inventory: inventory, active_tab: "statistics" %>
+
+<div class="stats-grid" aria-label="<%= t("statistics.summary_label", default: "Inventory summary") %>">
+  <div class="stats-card"><strong><%= number_with_delimiter((statistics.respond_to?(:item_count) ? statistics.item_count : inventory.items_count).to_i) %></strong><span><%= t("statistics.total_items", default: "Total items") %></span></div>
+  <div class="stats-card"><strong><%= number_with_delimiter(field_statistics.size) %></strong><span><%= t("statistics.custom_fields", default: "Custom fields") %></span></div>
+  <div class="stats-card"><strong><%= number_with_delimiter(numeric_statistics.size) %></strong><span><%= t("statistics.numeric_fields", default: "Numeric fields") %></span></div>
+  <div class="stats-card"><strong><%= number_with_delimiter(value_statistics.size) %></strong><span><%= t("statistics.common_values", default: "Common values shown") %></span></div>
+</div>
+
+<div class="inventory-content-grid">
+  <div class="dashboard-stack">
+    <section class="panel" aria-labelledby="numeric-statistics-heading">
+      <header class="panel__header"><div><h2 id="numeric-statistics-heading"><%= t("statistics.numeric.heading", default: "Numeric fields") %></h2><p class="section-copy"><%= t("statistics.numeric.description", default: "Average, minimum, and maximum for numeric values.") %></p></div></header>
+      <% if numeric_statistics.any? %>
+        <div class="table-wrap">
+          <table class="data-table stat-table">
+            <caption class="sr-only"><%= t("statistics.numeric.caption", default: "Statistics for numeric fields in %{inventory}", inventory: inventory.title) %></caption>
+            <thead><tr><th scope="col"><%= t("common.field", default: "Field") %></th><th scope="col"><%= t("statistics.values", default: "Values") %></th><th scope="col"><%= t("statistics.average", default: "Average") %></th><th scope="col"><%= t("statistics.minimum", default: "Minimum") %></th><th scope="col"><%= t("statistics.maximum", default: "Maximum") %></th></tr></thead>
+            <tbody>
+              <% numeric_statistics.each do |stat| %>
+                <tr>
+                  <th scope="row"><span class="table-primary"><%= stat[:field].title %></span></th>
+                  <td><%= number_with_delimiter(stat[:count].to_i) %></td>
+                  <td><%= number_with_delimiter(stat[:average].to_f, precision: 2) %></td>
+                  <td><%= number_with_delimiter(stat[:minimum].to_f, precision: 2) %></td>
+                  <td><%= number_with_delimiter(stat[:maximum].to_f, precision: 2) %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <%= render "shared/empty_state", title: t("statistics.numeric.empty", default: "No numeric data"), description: t("statistics.numeric.empty_description", default: "Statistics appear as items collect values in numeric fields."), icon: "empty" %>
+      <% end %>
+    </section>
+
+    <section class="panel" aria-labelledby="value-statistics-heading">
+      <header class="panel__header"><div><h2 id="value-statistics-heading"><%= t("statistics.values.heading", default: "Common values") %></h2><p class="section-copy"><%= t("statistics.values.description", default: "The most frequently used values in text fields.") %></p></div></header>
+      <% if value_statistics.any? %>
+        <div class="table-wrap">
+          <table class="data-table stat-table">
+            <caption class="sr-only"><%= t("statistics.values.caption", default: "Most frequently used values in %{inventory}", inventory: inventory.title) %></caption>
+            <thead><tr><th scope="col"><%= t("common.field", default: "Field") %></th><th scope="col"><%= t("common.value", default: "Value") %></th><th scope="col"><%= t("common.count", default: "Count") %></th><th scope="col"><%= t("statistics.share", default: "Share") %></th></tr></thead>
+            <tbody>
+              <% value_statistics.each do |stat| %>
+                <% percent = maximum_value_count.positive? ? ((stat[:count].to_f / maximum_value_count) * 100).round : 0 %>
+                <tr>
+                  <th scope="row"><span class="table-primary"><%= stat[:field].title %></span></th>
+                  <td><%= stat[:value].presence || "—" %></td>
+                  <td><%= number_with_delimiter(stat[:count].to_i) %></td>
+                  <td class="bar-cell"><span class="bar" aria-hidden="true"><span class="bar__fill" style="width: <%= percent %>%"></span></span><span class="sr-only"><%= t("statistics.percent_of_largest", default: "%{percent} percent of the largest group", percent: percent) %></span></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <%= render "shared/empty_state", title: t("statistics.values.empty", default: "No repeated values yet"), description: t("statistics.values.empty_description", default: "Common values appear as more items are added."), icon: "empty" %>
+      <% end %>
+    </section>
+
+    <% if boolean_statistics.any? %>
+      <section class="panel" aria-labelledby="boolean-statistics-heading">
+        <header class="panel__header"><div><h2 id="boolean-statistics-heading"><%= t("statistics.boolean.heading", default: "True / false fields") %></h2><p class="section-copy"><%= t("statistics.boolean.description", default: "How often each checkbox state appears.") %></p></div></header>
+        <div class="table-wrap">
+          <table class="data-table stat-table">
+            <caption class="sr-only"><%= t("statistics.boolean.caption", default: "Boolean field statistics for %{inventory}", inventory: inventory.title) %></caption>
+            <thead><tr><th scope="col"><%= t("common.field", default: "Field") %></th><th scope="col"><%= t("common.true", default: "True") %></th><th scope="col"><%= t("common.false", default: "False") %></th><th scope="col"><%= t("common.total", default: "Total") %></th></tr></thead>
+            <tbody>
+              <% boolean_statistics.each do |stat| %>
+                <tr><th scope="row"><span class="table-primary"><%= stat[:field].title %></span></th><td><%= number_with_delimiter(stat[:true_count].to_i) %></td><td><%= number_with_delimiter(stat[:false_count].to_i) %></td><td><%= number_with_delimiter(stat[:count].to_i) %></td></tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    <% end %>
+  </div>
+
+  <aside class="side-stack">
+    <section class="side-card">
+      <h3><%= t("statistics.health.heading", default: "Inventory health") %></h3>
+      <dl class="side-stat-list">
+        <div><dt><%= t("statistics.health.items", default: "Items") %></dt><dd><%= inventory.items_count.to_i %></dd></div>
+        <div><dt><%= t("statistics.health.visible_fields", default: "Visible fields") %></dt><dd><%= inventory.fields.count(&:show_in_table?) %></dd></div>
+        <div><dt><%= t("common.visibility", default: "Visibility") %></dt><dd><%= inventory.is_public? ? t("common.public", default: "Public") : t("common.private", default: "Private") %></dd></div>
+        <div><dt><%= t("common.created", default: "Created") %></dt><dd><%= inventory.created_at&.strftime("%b %-d, %Y") %></dd></div>
+      </dl>
+    </section>
+  </aside>
+</div>

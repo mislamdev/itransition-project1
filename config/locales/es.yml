@@ -1,0 +1,624 @@
+# Los textos de la interfaz en español.
+#
+# El archivo se genera con script/build_locales.rb.
+es:
+  admin:
+    users:
+      title: Usuarios
+      heading: Gestión de usuarios
+      description: Gestiona el acceso a las cuentas, el bloqueo y los roles de administrador.
+      summary_label: Resumen de cuentas
+      total: Usuarios registrados
+      admins: Administradores
+      blocked: Cuentas bloqueadas
+      table_heading: Cuentas
+      filter_label: Filtrar cuentas
+      filter_placeholder: Filtrar cuentas…
+      status_filter: Filtrar por estado
+      all_accounts: Todas las cuentas
+      active: Activo
+      blocked_status: Bloqueada
+      block: Bloquear
+      unblock: Desbloquear
+      grant_admin: Convertir en admin
+      revoke_admin: Quitar admin
+      delete_confirmation: "¿Eliminar esta cuenta? Se borrarán sus inventarios y sus
+        elementos."
+      delete: Eliminar
+      table_caption: Cuentas registradas
+      user: Usuario
+      role: Rol
+      status: Estado
+      joined: Registrado el
+      select: Seleccionar
+      you: Tú
+      admin: Administrador
+      member: Miembro
+      no_matches: No hay cuentas que coincidan
+      clear_filters: Quita los filtros para volver a ver todas las cuentas.
+      empty: No hay cuentas
+      empty_description: Todavía no hay ninguna cuenta registrada.
+    eyebrow: Administración
+    self_demotion_note: Los administradores pueden quitarse a sí mismos el acceso
+      de administrador.
+    self_demotion_help: El cambio surte efecto de inmediato y te devuelve a la vista
+      normal del espacio de trabajo.
+  common:
+    select: Seleccionar
+    email: Correo electrónico
+    registered_user: Usuario registrado
+    unknown_user: Usuario desconocido
+    back_to_inventory: "← Volver a %{inventory}"
+    post_count: mensaje
+    post_count_plural: mensajes
+    sign_in: Iniciar sesión
+    view_all: Ver todo
+    inventory: Inventario
+    owner: Propietario
+    items: Elementos
+    open: Abrir
+    unknown: Propietario desconocido
+    cancel: Cancelar
+    save_changes: Guardar los cambios
+    back_to_items: "← Volver a los elementos"
+    shared: Compartido
+    private: Privado
+    inventory_count: inventario
+    inventory_count_plural: inventarios
+    description: Descripción
+    visibility: Visibilidad
+    open_inventory: Abrir el inventario
+    no_description: Todavía no hay descripción.
+    back_to_all: "← Todos los inventarios"
+    field: Campo
+    value: Valor
+    count: Cantidad
+    'true': Sí
+    'false': 'No'
+    total: Total
+    public: Público
+    created: Creado
+    person_count: persona
+    person_count_plural: personas
+    move_up: Subir
+    move_down: Bajar
+    field_count: campo
+    field_count_plural: campos
+    type: Tipo
+    'yes': Sí
+    'no': 'No'
+    likes: Me gusta
+    added: Añadido
+    open_item: Abrir el elemento
+    item_count: elemento
+    item_count_plural: elementos
+    like_count: me gusta
+    like_count_plural: me gusta
+    updated: Modificado
+    name: Nombre
+    joined: Registrado el
+    empty_description: Todavía no hay nada.
+    no_inventories: No se han encontrado inventarios
+    no_inventories_description: Prueba otra búsqueda o crea un inventario nuevo.
+    inventory_table_caption: Inventarios disponibles
+  comments:
+    title: Debate · %{inventory} · Stockroom
+    heading: Debate
+    description: Comparte contexto, haz preguntas y mantén un registro continuo para
+      todo el equipo.
+    start: Empieza la conversación
+    start_description: Los mensajes aparecen en orden y se actualizan solos para todos
+      los que miran este inventario.
+    add_post: Añadir un mensaje
+    markdown_supported: Se admite el formato Markdown.
+    markdown_toolbar: Formato Markdown
+    bold: Negrita
+    italic: Cursiva
+    link: Enlace
+    code: Código
+    placeholder: Escribe una actualización…
+    markdown_hint: Usa Markdown para enlaces, énfasis y listas.
+    submit: Publicar el mensaje
+    sign_in_to_comment: Inicia sesión para participar en el debate.
+    sign_in_hint: para comentar. Todo el mundo puede leer la conversación.
+    about: Sobre este debate
+    linear_description: Los mensajes son lineales y no se pueden insertar entre otros.
+      Los nuevos aparecen al final.
+    live_heading: Actualizaciones en directo
+    live_description: Esta conversación se actualiza cada pocos segundos mientras
+      mantengas abierta la pestaña.
+    updated: Actualizado
+    live: En directo
+    created: Tu mensaje se ha añadido.
+  dashboard:
+    title: Panel · Stockroom
+    eyebrow:
+      workspace: Tu espacio de trabajo de inventarios
+      organized: Inventario, bien organizado
+    greeting: Todo en su sitio, %{name}.
+    guest_heading: Un mejor hogar para todo lo que controlas.
+    signed_in_description: Explora tus catálogos, vigila los espacios de trabajo compartidos
+      y convierte una simple lista de campos en una colección útil.
+    guest_description: Explora catálogos públicos y descubre cómo organiza cada equipo
+      el equipo, los libros, los documentos y todo lo demás.
+    create_inventory: Crear un inventario
+    my_workspace: Mi espacio de trabajo
+    sign_in_to_contribute: Inicia sesión para colaborar
+    browse_inventories: Ver los inventarios
+    stats:
+      label: Resumen de los inventarios
+      inventories: Inventarios
+      items: Elementos catalogados
+      contributors: Colaboradores
+      shared: Catálogos compartidos
+    latest:
+      heading: Últimos inventarios
+      description: Catálogos nuevos de todo el espacio de trabajo.
+      empty: Todavía no hay inventarios
+      empty_signed_in: Crea tu primer inventario para empezar a catalogar.
+      empty_guest: Ahora mismo no hay inventarios públicos que mostrar.
+    popular:
+      heading: Más populares
+      description: Las cinco colecciones más grandes ahora mismo.
+      caption: Los cinco inventarios más populares por número de elementos
+      rank: Puesto
+    highlights:
+      label: Resumen del espacio de trabajo
+    tags:
+      heading: Explorar por etiqueta
+      description: Encuentra inventarios relacionados con un clic.
+      empty: Todavía no hay etiquetas
+      empty_description: Las etiquetas aparecerán cuando los inventarios las usen.
+    shared_workspaces:
+      heading: Pensado para el trabajo compartido
+      description: Invita a quien elijas o abre un catálogo a todo el equipo registrado.
+        La propiedad queda clara y los administradores pueden intervenir cuando haga
+        falta.
+    manage_access: Gestionar tus accesos
+    sign_in_to_collaborate: Inicia sesión para colaborar
+  errors:
+    forbidden_title: Acceso denegado · Stockroom
+    forbidden_eyebrow: 403 · Prohibido
+    forbidden_heading: No tienes acceso a esta página
+    forbidden: No tienes permiso para hacer eso.
+    back_home: Volver al panel
+    go_back: Volver atrás
+    invalid: El formulario contiene errores.
+    not_found: No se ha encontrado nada.
+    conflict: Los datos han sido cambiados por otra persona.
+  inventories:
+    form:
+      title: Título
+      title_placeholder: p. ej. Equipo del estudio
+      description: Descripción
+      description_placeholder: Describe qué pertenece a este inventario. Se admite
+        Markdown.
+      description_hint: Usa Markdown para títulos, enlaces y énfasis. El contenido
+        de los usuarios nunca se traduce.
+      category: Categoría
+      choose_category: Elige una categoría
+      image_url: URL de la ilustración
+      image_hint: Enlaza una imagen alojada en la nube; aquí no se sube ningún archivo.
+      tags: Etiquetas
+      tags_placeholder: cámara, equipo, estudio
+      tags_hint: Separa las etiquetas con comas. Las que ya existen aparecen mientras
+        escribes.
+      public: Inventario público
+      public_hint: Todos los usuarios registrados pueden añadir, editar y eliminar
+        elementos.
+      public_aria: Hacer público este inventario
+    create: Crear un inventario
+    tabs:
+      label: Secciones del inventario
+      items: Elementos
+      discussion: Debate
+      settings: Ajustes
+      fields: Campos
+      custom_id: ID personalizado
+      access: Acceso
+      statistics: Estadísticas
+    settings_title: Ajustes · %{inventory} · Stockroom
+    settings_heading: Ajustes del inventario
+    settings_description: Los cambios se guardan solos. Antes de cada actualización
+      se comprueba la versión más reciente.
+    autosave:
+      pending: Hay cambios sin guardar
+      saving: Guardando…
+      saved: Guardado
+      error: No se ha podido guardar
+      conflict: Otra persona ha cambiado este inventario
+      attention: Vuelve a cargar la página antes de seguir.
+      reload: Volver a cargar
+    all_saved: Todos los cambios guardados
+    general_heading: General
+    general_description: Título, descripción, categoría, visibilidad y etiquetas.
+    title: Inventarios · Stockroom
+    eyebrow: Catálogos
+    heading: Inventarios
+    description: Explora todas las colecciones o vuelve a una que poseas o compartas.
+    new: Inventario nuevo
+    all_heading: Todos los inventarios
+    filter_label: Filtrar inventarios
+    filter_placeholder: Filtrar esta lista…
+    visibility_filter: Filtrar por visibilidad
+    all_visibility: Toda la visibilidad
+    table_caption: Todos los inventarios disponibles
+    no_matches: No hay inventarios que coincidan
+    clear_filters: Quita los filtros para volver a ver la colección completa.
+    empty: Todavía no hay inventarios
+    empty_signed_in: Crea el primero y empieza a añadir campos útiles.
+    empty_guest: Ahora mismo no hay inventarios que mostrar.
+    new_title: Inventario nuevo · Stockroom
+    create_heading: Crear un inventario
+    create_description: Empieza por lo esencial. Después podrás añadir campos propios,
+      reglas de acceso y un formato de identificadores.
+    details_heading: Detalles del inventario
+    details_description: Dale a esta colección un propósito claro.
+    untitled: Inventario sin título
+    created: El inventario se ha creado.
+    updated: El inventario se ha actualizado.
+    destroyed: El inventario se ha eliminado.
+    conflict: Otra persona ha cambiado este inventario. Recarga la página.
+    not_allowed: No tienes permiso para cambiar este inventario.
+  statistics:
+    title: Estadísticas · Stockroom
+    heading: Estadísticas del inventario
+    description: Un resumen de lo que contiene este inventario.
+    summary_label: Resumen
+    total_items: Elementos en total
+    custom_fields: Campos propios
+    numeric_fields: Campos numéricos
+    common_values: Valores más frecuentes
+    numeric:
+      heading: Campos numéricos
+      description: El mínimo, el máximo y la media de cada campo numérico.
+      caption: Agregados de los campos numéricos de %{inventory}
+      empty: No hay campos numéricos
+      empty_description: Añade un campo numérico para ver sus agregados.
+    values:
+      heading: Valores más frecuentes
+      description: Los valores que más se repiten en cada campo de texto.
+      caption: Valores más frecuentes de los campos de %{inventory}
+      empty: Todavía no hay valores
+      empty_description: En cuanto se rellenen los campos aparecerán aquí los valores
+        más usados.
+    average: Media
+    minimum: Mínimo
+    maximum: Máximo
+    share: Porcentaje
+    percent_of_largest: "% del valor más frecuente"
+    boolean:
+      heading: Campos de sí y no
+      description: Cuántos elementos tienen la marca puesta.
+      caption: Campos de sí y no de %{inventory}
+    health:
+      heading: Estado del inventario
+      items: Elementos
+      visible_fields: Campos visibles en la tabla
+  accesses:
+    title: Acceso · %{inventory} · Stockroom
+    heading: Ajustes de acceso
+    description: Elige quién puede añadir elementos o abre el inventario a cualquier
+      usuario registrado.
+    list_heading: Personas con acceso de escritura
+    filter_label: Filtrar personas
+    filter_placeholder: Filtrar personas…
+    sort_label: Ordenar personas
+    sort_name: Nombre
+    sort_email: Correo
+    remove_selected: Quitar la selección
+    table_caption: Personas con acceso de escritura a %{inventory}
+    person: Persona
+    access: Acceso
+    select: Seleccionar a %{name}
+    registered_user: Usuario registrado
+    can_edit: Puede editar
+    no_matches: No hay personas que coincidan
+    clear_filters: Quita el filtro para ver a todas las personas con acceso.
+    empty: Todavía no hay accesos concretos
+    empty_description: Añade personas por nombre o correo, o vuelve el inventario
+      público abajo.
+    add_person: Añadir una persona
+    add_description: Empieza a escribir un nombre o una dirección de correo.
+    name_or_email: Nombre o correo
+    search_placeholder: Buscar personas registradas…
+    matches: Personas encontradas
+    suggestions_hint: Las sugerencias buscan por nombre y por correo electrónico.
+    add: Añadir persona
+    visibility: Visibilidad
+    visibility_description: Elige entre acceso compartido o restringido.
+    public: Inventario público
+    public_hint: Todos los usuarios registrados pueden añadir y editar elementos.
+    public_aria: Hacer público este inventario
+    save_visibility: Guardar la visibilidad
+    added: El usuario ya puede añadir elementos a este inventario.
+    removed: Se ha quitado el acceso.
+    updated: El inventario se ha actualizado.
+    user_not_found: No se ha encontrado ningún usuario con el nombre o el correo %{query}.
+    not_allowed: No tienes permiso para cambiar el acceso de este inventario.
+  custom_id:
+    heading: ID personalizado del inventario
+    description: Construye el formato de los ID de los elementos nuevos. Los ID que
+      ya existen no cambian.
+    format_heading: Formato del ID
+    format_description: Ordena hasta diez elementos. Arrástralos para reordenarlos
+      o usa los controles de cada tarjeta.
+    preview_updating: Actualizando la vista previa…
+    preview_unavailable: La vista previa no está disponible
+    generated: Generado
+    plain: Texto simple
+    remove: Quitar el elemento
+    max_elements: Se admiten como máximo diez elementos.
+    element_help_title: Sobre este elemento
+    help_button: Mostrar la ayuda de este tipo de elemento
+    kinds:
+      fixed: Texto fijo
+      random_20: Aleatorio de 20 bits
+      random_32: Aleatorio de 32 bits
+      random_6: Aleatorio de 6 dígitos
+      random_9: Aleatorio de 9 dígitos
+      guid: GUID
+      datetime: Fecha / hora
+      sequence: Secuencia
+    help:
+      fixed: Texto Unicode, como LAB- o 2026/
+      guid_format: Con guiones usa 8-4-4-4-12; compacto usa 32 caracteres hexadecimales.
+      datetime_format: Usa un patrón strftime, por ejemplo %Y%m%d para 20261115.
+      padding: El relleno numérico añade ceros a la izquierda, por ejemplo 0007.
+      random_20: Un número entre 0 y 1.048.575.
+      random_32: Un número entre 0 y 4.294.967.295.
+      random_6: Un número entre 0 y 999.999.
+      random_9: Un número entre 0 y 999.999.999.
+      guid: Un identificador único global, con guiones o compacto.
+      datetime: La fecha y hora de creación, con un patrón strftime como %Y%m%d.
+      sequence: El número siguiente al mayor que ya se ha usado en este inventario.
+    guid_format: Formato del GUID
+    datetime_format: Formato de fecha
+    padding: Relleno con ceros a la izquierda
+    save: Guardar el formato de los ID
+    preview_label: Vista previa en directo
+    preview_heading: El ID de tu próximo elemento
+    preview_help: El servidor lo genera con las mismas reglas que se usan al crear
+      un elemento.
+    preview_waiting: Esperando un formato…
+    help_title: Ayuda de formato
+    saved: Se ha guardado el formato de los identificadores.
+    not_allowed: No tienes permiso para cambiar los identificadores de este inventario.
+    error_message: no coincide con el formato %{pattern}
+    duplicate: No se ha podido generar un identificador libre, escribe uno tú mismo.
+  fields:
+    form:
+      title: Título
+      title_placeholder: p. ej. Modelo o año de compra
+      description: Descripción / pista
+      description_placeholder: Indicación opcional que se muestra junto al campo.
+      type: Tipo de campo
+      choose_type: Elige un tipo
+      type_hint: Usa un campo de una línea para valores cortos y uno de varias líneas
+        para notas.
+      show_in_table: Mostrar en la tabla de elementos
+      show_in_table_hint: Incluye este campo como columna en la pestaña de elementos
+        del inventario.
+      choices: Opciones
+      choices_hint: Escribe una opción por línea.
+      save: Guardar el campo
+      add: Añadir campo
+    types:
+      text: Texto de una línea
+      textarea: Texto de varias líneas
+      number: Número
+      document: Enlace a un documento o una imagen
+      boolean: Sí / No
+      select: Elegir de una lista
+    edit_title: Editar %{field} · %{inventory} · Stockroom
+    back: "← Volver a los campos"
+    edit_heading: Editar %{field}
+    edit_description: Los cambios se aplican al formulario y a la tabla de elementos
+      del inventario.
+    details_heading: Detalles del campo
+    edit_details_description: Cambia la etiqueta, la indicación, el tipo o la visibilidad
+      en la tabla.
+    delete: Eliminar el campo
+    delete_confirmation: "¿Eliminar este campo y sus valores? No se puede deshacer."
+    title: Campos · %{inventory} · Stockroom
+    heading: Campos propios
+    description: Define la información estructurada que se recoge en cada elemento.
+      Arrastra las filas para ordenarlas o usa los controles de arriba.
+    table_heading: Campos del inventario
+    add: Añadir campo
+    move_up: Subir
+    move_down: Bajar
+    save_order: Guardar el orden
+    delete_selected: Eliminar la selección
+    table_caption: Campos propios de %{inventory}, en el orden shown
+    in_table: En la tabla
+    select: Seleccionar %{title}
+    drag_handle: Arrastra para reordenar
+    order_saved: El orden de los campos está al día
+    order_error: El orden de los campos no se ha podido guardar.
+    empty: No hay campos propios
+    empty_description: Añade campos de texto, número, documento o casilla para recoger
+      la información que necesita tu equipo.
+    add_first: Añadir el primer campo
+    limits_label: Límites por tipo de campo
+    new_title: Campo nuevo · %{inventory} · Stockroom
+    add_heading: Añadir un campo propio
+    add_description: Elige el tipo de información que debe recoger este campo.
+    details_description: Un título claro y una pista corta ayudan a todos a escribir
+      valores iguales.
+    created: El campo se ha creado.
+    updated: El campo se ha actualizado.
+    destroyed: El campo se ha eliminado.
+    not_allowed: No tienes permiso para cambiar los campos de este inventario.
+  items:
+    form:
+      custom_id: ID personalizado del inventario
+      custom_id_placeholder: p. ej. INV-0007
+      custom_id_hint: Se aplican las reglas de ID actuales del inventario. Los IDs
+        son únicos dentro del inventario.
+      created_by: Creado por
+      created_at: Creado el
+      document_hint: Enlaza un documento o una imagen.
+      boolean_hint: Marca la casilla cuando aplique.
+      choose: Elegir…
+      no_fields: Todavía no hay campos propios.
+      no_fields_description: El propietario puede añadir campos para recoger información
+        estructurada de cada elemento.
+      save: Guardar el elemento
+      add: Añadir elemento
+    item_label: Elemento
+    from: del inventario
+    table_caption: Elementos de %{inventory}
+    custom_id: ID personalizado
+    no_matches: No hay elementos que coincidan
+    clear_filters: Quita el filtro para ver todos los elementos de este inventario.
+    empty: Todavía no hay elementos
+    empty_writable: Añade el primer elemento y da a este inventario un punto de partida
+      útil.
+    empty_read_only: Los elementos que añadan los colaboradores aparecerán aquí.
+    add_first: Añadir el primer elemento
+    edit_title: Editar %{id} · Stockroom
+    back_to_item: "← Volver al elemento"
+    edit_heading: Editar
+    edit_description: Actualiza este elemento de %{inventory}.
+    details_heading: Detalles del elemento
+    id_validation_description: El ID se valida con el formato actual del inventario.
+    delete: Eliminar el elemento
+    delete_confirmation: "¿Eliminar este elemento definitivamente? No se puede deshacer."
+    inventory_label: Inventario
+    no_description: Todavía no se ha añadido ninguna descripción.
+    shared_with_all: Compartido con todos los miembros
+    restricted_access: Acceso restringido
+    owned_by: Propiedad de
+    add: Añadir elemento
+    read_only: Estás viendo un inventario de solo lectura.
+    sign_in_to_edit: para añadir o editar elementos cuando el acceso lo permita.
+    heading: Elementos del inventario
+    filter_label: Filtrar elementos
+    filter_placeholder: Filtrar elementos…
+    new_title: Elemento nuevo · %{inventory} · Stockroom
+    add_heading: Añadir un elemento
+    add_description: Escribe el ID personalizado y la información que recoge este
+      inventario.
+    owner_fields_description: Aquí aparecen los campos marcados por el propietario
+      del inventario.
+    added_on: Añadido el %{date}
+    added_by: " por %{name}"
+    unlike: Quitar el me gusta
+    like: Me gusta
+    edit: Editar el elemento
+    details_description: Valores recogidos por los campos propios de este inventario.
+    values_caption: Valores de los campos propios de %{id}
+    open_document: Abrir el documento
+    no_custom_fields: No hay campos propios
+    no_custom_fields_description: El propietario puede añadir campos para recoger
+      información estructurada de este elemento.
+    record: Registro
+    inventory_id: ID del inventario
+    about_inventory: Sobre este inventario
+    created: El elemento se ha creado.
+    updated: El elemento se ha actualizado.
+    destroyed: El elemento se ha eliminado.
+    conflict: Otra persona ha cambiado este elemento. Recarga la página.
+    not_allowed: No tienes permiso para cambiar los elementos de este inventario.
+    custom_id_taken: Este identificador ya se usa en este inventario. Elige otro.
+  app:
+    name: Stockroom · Inventario
+    description: Un espacio de trabajo tranquilo y colaborativo para catalogar inventarios.
+    layout:
+      skip_to_content: Saltar al contenido
+      search_label: Buscar inventarios, elementos y personas
+      search_placeholder: Buscar inventarios, elementos, personas…
+      language: Idioma
+      toggle_theme: Cambiar el tema de color
+      guest: Visitante
+      account_menu: Menú de la cuenta
+      account: Cuenta
+      my_workspace: Mi espacio de trabajo
+      administration: Administración
+      sign_out: Cerrar sesión
+      sign_in: Iniciar sesión
+    languages:
+      english: English
+      spanish: Español
+    footer:
+      tagline: Inventario, sin el ruido.
+  auth:
+    get_started: Empezar
+    sign_up:
+      heading: Crea tu cuenta
+      description: Crea inventarios reutilizables y colabora con tu equipo.
+      submit: Crear cuenta
+    continue_google: Continuar con Google
+    continue_facebook: Continuar con Facebook
+    or_email: o usa tu correo
+    name: Nombre
+    email: Correo electrónico
+    password: Contraseña
+    password_confirmation: Confirma la contraseña
+    have_account: "¿Ya tienes una cuenta?"
+    sign_in:
+      link: Iniciar sesión
+      heading: Inicia sesión en Stockroom
+      description: Continúa con tus inventarios, las colecciones compartidas y los
+        debates.
+      submit: Iniciar sesión
+    promise:
+      eyebrow: Un único espacio de trabajo tranquilo
+      signup_heading: Da a cada colección una estructura que se entienda.
+      description: Campos estructurados, identificadores flexibles y controles de
+        acceso cuidadosos, sin el ruido.
+      heading: Cada colección, exactamente como la ve tu equipo.
+    welcome_back: Te damos la bienvenida de nuevo
+    no_account: "¿Nuevo en Stockroom?"
+    create_account: Crear una cuenta
+    sign_in_required: Inicia sesión para continuar.
+    admin_required: No tienes permiso para ver esta página.
+  search:
+    title: Buscar
+    eyebrow: Búsqueda de texto completo
+    results_for: Resultados de «%{query}»
+    heading: Buscar en Stockroom
+    results_found: resultados entre inventarios, elementos y personas.
+    input_label: Buscarlo todo
+    placeholder: Prueba con un título, un ID de elemento, un valor de campo o una
+      persona…
+    submit: Buscar
+    no_results: No se han encontrado resultados
+    no_results_help: Revisa la ortografía o busca un término más general.
+    categories: Categorías de los resultados
+    all_results: Todos
+    inventories: Inventarios
+    items: Elementos
+    people: Personas
+    inventory_caption: Inventarios que coinciden con %{query}
+    item_caption: Elementos que coinciden con %{query}
+    people_caption: Personas que coinciden con %{query}
+  users:
+    owned_caption: Inventarios de %{user}
+    select_inventory: Seleccionar %{title}
+    no_matches: No hay inventarios que coincidan
+    clear_filters: Quita el filtro para ver la lista completa.
+    no_owned: No hay inventarios propios
+    no_owned_description: Aquí aparecerán los inventarios que cree este usuario.
+    shared_caption: Inventarios en los que este usuario puede colaborar
+    clear_shared_filters: Quita el filtro para ver todos los inventarios compartidos.
+    no_shared: No hay inventarios compartidos
+    no_shared_description: Aquí aparecerán los inventarios en los que este usuario
+      puede escribir.
+    owned_inventory_count: inventario propio
+    owned_inventory_count_plural: inventarios propios
+    manage_workspace: Gestionar mi espacio de trabajo
+    owned_heading: Inventarios propios
+    filter_owned: Filtrar los inventarios propios…
+    sort_owned: Ordenar los inventarios propios
+    default_order: Orden predeterminado
+    sort_name: Nombre
+    sort_newest: Más recientes
+    sort_oldest: Más antiguos
+    edit_selected: Editar la selección
+    delete_confirmation: "¿Eliminar la cuenta de %{name}? No se puede deshacer."
+    delete_selected: Eliminar la selección
+    shared_heading: Inventarios compartidos
+    filter_shared: Filtrar los inventarios compartidos…
+    sort_shared: Ordenar los inventarios compartidos

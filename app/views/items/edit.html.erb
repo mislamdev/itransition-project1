@@ -1,0 +1,28 @@
+<% item = @item || local_assigns[:item] %>
+<% inventory = item.inventory %>
+<% content_for :title, t("items.edit_title", default: "Edit %{id} · Stockroom", id: item.custom_id) %>
+
+<div class="item-form-shell">
+  <header class="page-header">
+    <div class="page-header__copy">
+      <a class="table-link" href="<%= item_path(item) %>"><%= t("items.back_to_item", default: "← Back to item") %></a>
+      <h1><%= t("items.edit_heading", default: "Edit") %> <span class="item-id"><%= item.custom_id %></span></h1>
+      <p><%= t("items.edit_description", default: "Update this item in %{inventory}.", inventory: inventory.title) %></p>
+    </div>
+  </header>
+
+  <section class="panel">
+    <header class="panel__header">
+      <div>
+        <h2><%= t("items.details_heading", default: "Item details") %></h2>
+        <p class="section-copy"><%= t("items.id_validation_description", default: "The ID is validated against the inventory’s current format.") %></p>
+      </div>
+    </header>
+    <div class="panel__body"><%= render "form", item: item, inventory: inventory %></div>
+    <% if can_edit_item?(item) %>
+      <footer class="panel__footer">
+        <%= button_to t("items.delete", default: "Delete item"), item_path(item), method: :delete, class: "button button--danger", form: { data: { confirm: t("items.delete_confirmation", default: "Delete this item permanently? This cannot be undone.") } } %>
+      </footer>
+    <% end %>
+  </section>
+</div>

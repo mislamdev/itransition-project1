@@ -1,0 +1,132 @@
+<% content_for :title, t("dashboard.title", default: "Dashboard · Stockroom") %>
+
+<% latest_inventories = @latest_inventories || @inventories || [] %>
+<% popular_inventories = @popular_inventories || [] %>
+<% tags = @tags || [] %>
+<% signed_in = user_signed_in? %>
+
+<section class="dashboard-hero">
+  <div class="dashboard-hero__copy">
+    <span class="eyebrow"><%= signed_in ? t("dashboard.eyebrow.workspace", default: "Your inventory workspace") : t("dashboard.eyebrow.organized", default: "Inventory, clearly organized") %></span>
+    <h1><%= signed_in ? t("dashboard.greeting", default: "Everything in its place, %{name}.", name: current_user.name.presence || current_user.email.to_s.split("@").first) : t("dashboard.guest_heading", default: "A better home for everything you track.") %></h1>
+    <p>
+      <%= signed_in ? t("dashboard.signed_in_description", default: "Browse your catalogs, keep an eye on shared workspaces, and turn a simple field list into a useful collection.") : t("dashboard.guest_description", default: "Explore public catalogs and discover how teams organize equipment, books, documents, and everything in between.") %>
+    </p>
+    <div class="dashboard-hero__actions">
+      <% if signed_in %>
+        <a class="button button--primary" href="<%= new_inventory_path %>">
+          <svg class="button__icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 4v12M4 10h12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <%= t("dashboard.create_inventory", default: "Create inventory") %>
+        </a>
+        <a class="button button--secondary" href="<%= profile_path %>"><%= t("dashboard.my_workspace", default: "My workspace") %></a>
+      <% else %>
+        <a class="button button--primary" href="<%= sign_in_path %>"><%= t("dashboard.sign_in_to_contribute", default: "Sign in to contribute") %></a>
+        <a class="button button--secondary" href="<%= inventories_path %>"><%= t("dashboard.browse_inventories", default: "Browse inventories") %></a>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="dashboard-stats" aria-label="<%= t("dashboard.stats.label", default: "Inventory overview") %>">
+    <div class="dashboard-stat">
+      <strong><%= number_with_delimiter((@inventory_count || latest_inventories.size).to_i) %></strong>
+      <span><%= t("dashboard.stats.inventories", default: "Inventories") %></span>
+    </div>
+    <div class="dashboard-stat">
+      <strong><%= number_with_delimiter((@item_count || latest_inventories.sum { |inventory| inventory.items_count.to_i }).to_i) %></strong>
+      <span><%= t("dashboard.stats.items", default: "Items catalogued") %></span>
+    </div>
+    <div class="dashboard-stat">
+      <strong><%= number_with_delimiter((@inventory_owner_count || @creator_count || 0).to_i) %></strong>
+      <span><%= t("dashboard.stats.contributors", default: "Contributors") %></span>
+    </div>
+    <div class="dashboard-stat">
+      <strong><%= number_with_delimiter((@shared_inventory_count || popular_inventories.size).to_i) %></strong>
+      <span><%= t("dashboard.stats.shared", default: "Shared catalogs") %></span>
+    </div>
+  </div>
+</section>
+
+<div class="dashboard-grid">
+  <div class="dashboard-stack">
+    <section class="panel inventory-list-panel" aria-labelledby="latest-heading">
+      <header class="panel__header">
+        <div>
+          <h2 id="latest-heading"><%= t("dashboard.latest.heading", default: "Latest inventories") %></h2>
+          <p class="section-copy"><%= t("dashboard.latest.description", default: "Fresh catalogs from across the workspace.") %></p>
+        </div>
+        <a class="button button--ghost button--small" href="<%= inventories_path %>"><%= t("common.view_all", default: "View all") %> <span aria-hidden="true">→</span></a>
+      </header>
+      <%= render "shared/inventory_rows",
+                inventories: latest_inventories,
+                empty_title: t("dashboard.latest.empty", default: "No inventories yet"),
+                empty_description: signed_in ? t("dashboard.latest.empty_signed_in", default: "Create your first inventory to start cataloguing.") : t("dashboard.latest.empty_guest", default: "There are no public inventories to show right now.") %>
+    </section>
+
+    <% if popular_inventories.any? %>
+      <section class="panel" aria-labelledby="popular-heading">
+        <header class="panel__header">
+          <div>
+            <h2 id="popular-heading"><%= t("dashboard.popular.heading", default: "Most popular") %></h2>
+            <p class="section-copy"><%= t("dashboard.popular.description", default: "The five largest collections right now.") %></p>
+          </div>
+        </header>
+        <div class="table-wrap">
+          <table class="data-table popular-table">
+            <caption class="sr-only"><%= t("dashboard.popular.caption", default: "The five most popular inventories by number of items") %></caption>
+            <thead>
+              <tr>
+                <th scope="col"><%= t("dashboard.popular.rank", default: "Rank") %></th>
+                <th scope="col"><%= t("common.inventory", default: "Inventory") %></th>
+                <th scope="col"><%= t("common.owner", default: "Owner") %></th>
+                <th scope="col"><%= t("common.items", default: "Items") %></th>
+                <th scope="col"><span class="sr-only"><%= t("common.open", default: "Open") %></span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <% popular_inventories.first(5).each_with_index do |inventory, index| %>
+                <tr class="data-table__row" data-row-link>
+                  <td><span class="popular-item__rank"><%= format("%02d", index + 1) %></span></td>
+                  <td>
+                    <a class="table-primary" href="<%= inventory_path(inventory) %>"><%= inventory.title %></a>
+                    <span class="table-secondary"><%= inventory.category&.name.presence || t("common.inventory", default: "Inventory") %></span>
+                  </td>
+                  <td><span class="popular-item__meta"><%= inventory.owner&.name.presence || inventory.owner&.email.presence || t("common.unknown", default: "Unknown owner") %></span></td>
+                  <td><span class="number-cell"><%= number_with_delimiter(inventory.items_count.to_i) %></span></td>
+                  <td class="table-arrow" aria-hidden="true">›</td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    <% end %>
+  </div>
+
+  <aside class="dashboard-stack" aria-label="<%= t("dashboard.highlights.label", default: "Workspace highlights") %>">
+    <section class="panel" aria-labelledby="tags-heading">
+      <header class="panel__header">
+        <div>
+          <h2 id="tags-heading"><%= t("dashboard.tags.heading", default: "Browse by tag") %></h2>
+          <p class="section-copy"><%= t("dashboard.tags.description", default: "Find related inventories in one click.") %></p>
+        </div>
+      </header>
+      <% if tags.any? %>
+        <div class="tag-cloud">
+          <% tags.each do |tag| %>
+            <% tag_name = tag.respond_to?(:name) ? tag.name : tag.to_s %>
+            <a class="tag-cloud__tag" href="<%= search_path(tag: tag_name) %>"><%= tag_name %></a>
+          <% end %>
+        </div>
+      <% else %>
+        <%= render "shared/empty_state", title: t("dashboard.tags.empty", default: "No tags yet"), description: t("dashboard.tags.empty_description", default: "Tags will appear as inventories use them."), icon: "empty" %>
+      <% end %>
+    </section>
+
+    <section class="side-card">
+      <h3><%= t("dashboard.shared_workspaces.heading", default: "Designed for shared work") %></h3>
+      <p class="section-copy"><%= t("dashboard.shared_workspaces.description", default: "Invite selected people or open a catalog to every signed-in teammate. Ownership stays clear, and admins can step in when needed.") %></p>
+      <hr class="divider">
+      <a class="button button--secondary button--small" href="<%= signed_in ? profile_path : sign_in_path %>"><%= signed_in ? t("dashboard.manage_access", default: "Manage your access") : t("dashboard.sign_in_to_collaborate", default: "Sign in to collaborate") %></a>
+    </section>
+  </aside>
+</div>

@@ -1,0 +1,8 @@
+<article class="discussion-post" id="comment-<%= comment.id %>">
+  <header class="discussion-post__header">
+    <span class="avatar" aria-hidden="true"><%= comment.user&.name.to_s.first.to_s.upcase %></span>
+    <a class="discussion-post__author" href="<%= user_path(comment.user) %>"><%= comment.user&.name.presence || comment.user&.email.presence || t("common.unknown_user", default: "Unknown user") %></a>
+    <time class="discussion-post__time" datetime="<%= comment.created_at.iso8601 %>"><%= comment.created_at.strftime("%b %-d, %Y · %H:%M") %></time>
+  </header>
+  <div class="discussion-post__body markdown-body"><%= render "shared/markdown", text: comment.body %></div>
+</article>

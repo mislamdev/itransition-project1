@@ -1,0 +1,33 @@
+<% content_for :title, t("inventories.settings_title", default: "Settings · %{inventory} · Stockroom", inventory: @inventory.title) %>
+
+<div class="inventory-content-grid inventory-content-grid--wide">
+  <section>
+    <header class="page-header">
+      <div class="page-header__copy">
+        <a class="table-link" href="<%= inventory_path(@inventory) %>"><%= t("common.back_to_items", default: "← Back to items") %></a>
+        <h1><%= t("inventories.settings_heading", default: "Inventory settings") %></h1>
+        <p><%= t("inventories.settings_description", default: "Changes save automatically. The most recent version is checked before every update.") %></p>
+      </div>
+      <span class="autosave-status" data-autosave-status data-state="saved"
+            data-pending-message="<%= t("inventories.autosave.pending", default: "Waiting to save…") %>"
+            data-saving-message="<%= t("inventories.autosave.saving", default: "Saving changes…") %>"
+            data-saved-message="<%= t("inventories.autosave.saved", default: "All changes saved") %>"
+            data-error-message="<%= t("inventories.autosave.error", default: "Could not save changes") %>"
+            data-conflict-message="<%= t("inventories.autosave.conflict", default: "Conflict — not saved") %>"
+            data-attention-message="<%= t("inventories.autosave.attention", default: "Changes need attention") %>"
+            data-reload-message="<%= t("inventories.autosave.reload", default: "Reload server version") %>"><%= t("inventories.all_saved", default: "All changes saved") %></span>
+    </header>
+
+    <div class="panel">
+      <header class="panel__header">
+        <div>
+          <h2><%= t("inventories.general_heading", default: "General") %></h2>
+          <p class="section-copy"><%= t("inventories.general_description", default: "Title, description, category, visibility, and tags.") %></p>
+        </div>
+      </header>
+      <div class="panel__body">
+        <%= render "form", inventory: @inventory, categories: (@categories || []), autosave: true %>
+      </div>
+    </div>
+  </section>
+</div>

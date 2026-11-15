@@ -1,0 +1,615 @@
+# The texts of the interface.
+#
+# The file is built by script/build_locales.rb; edit the sources (the
+# defaults of the views, script/translations_es.yml or the texts of the
+# backend in that script) and build it again.
+en:
+  admin:
+    users:
+      title: User administration · Stockroom
+      heading: User management
+      description: Manage account access, blocking, and administrator roles.
+      summary_label: User overview
+      total: Registered users
+      admins: Administrators
+      blocked: Blocked accounts
+      table_heading: Registered users
+      filter_label: Filter users
+      filter_placeholder: Filter users…
+      status_filter: Filter account status
+      all_accounts: All accounts
+      active: Active
+      blocked_status: Blocked
+      block: Block
+      unblock: Unblock
+      grant_admin: Make admin
+      revoke_admin: Remove admin
+      delete_confirmation: Delete the selected accounts? This cannot be undone.
+      delete: Delete
+      table_caption: Registered users and their account roles
+      user: User
+      role: Role
+      status: Status
+      joined: Joined
+      select: Select %{name}
+      you: You
+      admin: Administrator
+      member: Member
+      no_matches: No matching users
+      clear_filters: Clear the filter to see every account.
+      empty: No users
+      empty_description: Registered users will appear here.
+    eyebrow: Administration
+    self_demotion_note: Administrators can remove their own administrator access.
+    self_demotion_help: The change takes effect immediately and sends you back to
+      the standard workspace view.
+  common:
+    select: Select
+    email: Email
+    registered_user: Registered user
+    unknown_user: Unknown user
+    back_to_inventory: "← Back to %{inventory}"
+    post_count: post
+    post_count_plural: posts
+    sign_in: Sign in
+    view_all: View all
+    inventory: Inventory
+    owner: Owner
+    items: Items
+    open: Open
+    unknown: Unknown owner
+    cancel: Cancel
+    save_changes: Save changes
+    back_to_items: "← Back to items"
+    shared: Shared
+    private: Private
+    inventory_count: inventory
+    inventory_count_plural: inventories
+    description: Description
+    visibility: Visibility
+    open_inventory: Open inventory
+    no_description: No description
+    back_to_all: "← All inventories"
+    field: Field
+    value: Value
+    count: Count
+    'true': 'True'
+    'false': 'False'
+    total: Total
+    public: Public
+    created: Created
+    person_count: person
+    person_count_plural: people
+    move_up: Move up
+    move_down: Move down
+    field_count: field
+    field_count_plural: fields
+    type: Type
+    'yes': 'Yes'
+    'no': 'No'
+    likes: Likes
+    added: Added
+    open_item: Open item
+    item_count: item
+    item_count_plural: items
+    like_count: like
+    like_count_plural: likes
+    updated: Updated
+    name: Name
+    joined: Joined
+    empty_description: New records will appear here.
+    no_inventories: No inventories found
+    no_inventories_description: Try another search or create a new inventory.
+    inventory_table_caption: Available inventories
+  comments:
+    title: Discussion · %{inventory} · Stockroom
+    heading: Discussion
+    description: Share context, ask questions, and keep an ongoing record for the
+      whole team.
+    start: Start the conversation
+    start_description: Posts appear in order and update automatically for everyone
+      viewing this inventory.
+    add_post: Add a post
+    markdown_supported: Markdown formatting is supported.
+    markdown_toolbar: Markdown formatting
+    bold: Bold
+    italic: Italic
+    link: Link
+    code: Code
+    placeholder: Write a thoughtful update…
+    markdown_hint: Use Markdown for links, emphasis, and lists.
+    submit: Post comment
+    sign_in_to_comment: Sign in to join the discussion.
+    sign_in_hint: to post a comment. Everyone can read the conversation.
+    about: About this discussion
+    linear_description: Posts are linear and cannot be inserted between existing messages.
+      New posts appear at the end.
+    live_heading: Live updates
+    live_description: This conversation refreshes every few seconds while you keep
+      this tab open.
+    updated: Updated just now
+    live: Live
+    created: Your post was added.
+  dashboard:
+    title: Dashboard · Stockroom
+    eyebrow:
+      workspace: Your inventory workspace
+      organized: Inventory, clearly organized
+    greeting: Everything in its place, %{name}.
+    guest_heading: A better home for everything you track.
+    signed_in_description: Browse your catalogs, keep an eye on shared workspaces,
+      and turn a simple field list into a useful collection.
+    guest_description: Explore public catalogs and discover how teams organize equipment,
+      books, documents, and everything in between.
+    create_inventory: Create inventory
+    my_workspace: My workspace
+    sign_in_to_contribute: Sign in to contribute
+    browse_inventories: Browse inventories
+    stats:
+      label: Inventory overview
+      inventories: Inventories
+      items: Items catalogued
+      contributors: Contributors
+      shared: Shared catalogs
+    latest:
+      heading: Latest inventories
+      description: Fresh catalogs from across the workspace.
+      empty: No inventories yet
+      empty_signed_in: Create your first inventory to start cataloguing.
+      empty_guest: There are no public inventories to show right now.
+    popular:
+      heading: Most popular
+      description: The five largest collections right now.
+      caption: The five most popular inventories by number of items
+      rank: Rank
+    highlights:
+      label: Workspace highlights
+    tags:
+      heading: Browse by tag
+      description: Find related inventories in one click.
+      empty: No tags yet
+      empty_description: Tags will appear as inventories use them.
+    shared_workspaces:
+      heading: Designed for shared work
+      description: Invite selected people or open a catalog to every signed-in teammate.
+        Ownership stays clear, and admins can step in when needed.
+    manage_access: Manage your access
+    sign_in_to_collaborate: Sign in to collaborate
+  errors:
+    forbidden_title: Access denied · Stockroom
+    forbidden_eyebrow: 403 · Forbidden
+    forbidden_heading: You don’t have access to this page
+    forbidden: You are not allowed to do that.
+    back_home: Back to dashboard
+    go_back: Go back
+    invalid: The form contains errors.
+    not_found: Nothing was found.
+    conflict: The data was changed by somebody else.
+  inventories:
+    form:
+      title: Title
+      title_placeholder: e.g. Studio equipment
+      description: Description
+      description_placeholder: Describe what belongs in this inventory. Markdown is
+        supported.
+      description_hint: Use Markdown for headings, links, and emphasis. User content
+        is never translated.
+      category: Category
+      choose_category: Choose a category
+      image_url: Illustration URL
+      image_hint: Link to a cloud-hosted image; nothing is uploaded to this server.
+      tags: Tags
+      tags_placeholder: camera, equipment, studio
+      tags_hint: Separate tags with commas. Existing matching tags appear as you type.
+      public: Public inventory
+      public_hint: Every signed-in user can add, edit, and delete items.
+      public_aria: Make this inventory public
+    create: Create inventory
+    tabs:
+      label: Inventory sections
+      items: Items
+      discussion: Discussion
+      settings: Settings
+      fields: Fields
+      custom_id: Custom ID
+      access: Access
+      statistics: Statistics
+    settings_title: Settings · %{inventory} · Stockroom
+    settings_heading: Inventory settings
+    settings_description: Changes save automatically. The most recent version is checked
+      before every update.
+    autosave:
+      pending: Waiting to save…
+      saving: Saving changes…
+      saved: All changes saved
+      error: Could not save changes
+      conflict: Conflict — not saved
+      attention: Changes need attention
+      reload: Reload server version
+    all_saved: All changes saved
+    general_heading: General
+    general_description: Title, description, category, visibility, and tags.
+    title: Inventories · Stockroom
+    eyebrow: Catalogues
+    heading: Inventories
+    description: Explore every collection, or jump back into one you own or share.
+    new: New inventory
+    all_heading: All inventories
+    filter_label: Filter inventories
+    filter_placeholder: Filter this list…
+    visibility_filter: Filter by visibility
+    all_visibility: All visibility
+    table_caption: All available inventories
+    no_matches: No matching inventories
+    clear_filters: Clear the filters to see the full collection again.
+    empty: No inventories yet
+    empty_signed_in: Create the first one and start adding useful fields.
+    empty_guest: There are no inventories to show right now.
+    new_title: New inventory · Stockroom
+    create_heading: Create an inventory
+    create_description: Start with the essentials. You can add custom fields, access
+      rules, and an ID format next.
+    details_heading: Inventory details
+    details_description: Give this collection a clear purpose.
+    untitled: Untitled inventory
+    created: The inventory was created.
+    updated: The inventory was updated.
+    destroyed: The inventory was deleted.
+    conflict: This inventory was changed by somebody else. Please reload the page.
+    not_allowed: You are not allowed to change this inventory.
+  statistics:
+    title: Statistics · %{inventory} · Stockroom
+    heading: Inventory statistics
+    description: A read-only summary of the values collected across every item.
+    summary_label: Inventory summary
+    total_items: Total items
+    custom_fields: Custom fields
+    numeric_fields: Numeric fields
+    common_values: Common values shown
+    numeric:
+      heading: Numeric fields
+      description: Average, minimum, and maximum for numeric values.
+      caption: Statistics for numeric fields in %{inventory}
+      empty: No numeric data
+      empty_description: Statistics appear as items collect values in numeric fields.
+    values:
+      heading: Common values
+      description: The most frequently used values in text fields.
+      caption: Most frequently used values in %{inventory}
+      empty: No repeated values yet
+      empty_description: Common values appear as more items are added.
+    average: Average
+    minimum: Minimum
+    maximum: Maximum
+    share: Share
+    percent_of_largest: "%{percent} percent of the largest group"
+    boolean:
+      heading: True / false fields
+      description: How often each checkbox state appears.
+      caption: Boolean field statistics for %{inventory}
+    health:
+      heading: Inventory health
+      items: Items
+      visible_fields: Visible fields
+  accesses:
+    title: Access · %{inventory} · Stockroom
+    heading: Access settings
+    description: Choose who can contribute items, or open the inventory to every signed-in
+      member.
+    list_heading: Users with write access
+    filter_label: Filter people
+    filter_placeholder: Filter people…
+    sort_label: Sort people
+    sort_name: Name
+    sort_email: Email
+    remove_selected: Remove selected
+    table_caption: People granted write access to %{inventory}
+    person: Person
+    access: Access
+    select: Select %{name}
+    registered_user: Registered user
+    can_edit: Can edit
+    no_matches: No matching people
+    clear_filters: Clear the filter to see everyone with access.
+    empty: No specific access yet
+    empty_description: Add people by name or email, or make the inventory public below.
+    add_person: Add a person
+    add_description: Start typing either a name or email address.
+    name_or_email: Name or email
+    search_placeholder: Search registered people…
+    matches: Matching people
+    suggestions_hint: Suggestions match both names and email addresses.
+    add: Add person
+    visibility: Visibility
+    visibility_description: Choose shared or restricted access.
+    public: Public inventory
+    public_hint: Every signed-in user can add and edit items.
+    public_aria: Make this inventory public
+    save_visibility: Save visibility
+    added: The user may now add items to this inventory.
+    removed: The access was removed.
+    updated: The inventory was updated.
+    user_not_found: No user with the name or the email address %{query} was found.
+    not_allowed: You are not allowed to change the access of this inventory.
+  custom_id:
+    heading: Custom inventory ID
+    description: Build the format used for new item IDs. Existing IDs stay unchanged
+      when the format changes.
+    format_heading: ID format
+    format_description: Arrange up to ten elements. Drag to reorder or use the focused-card
+      controls.
+    preview_updating: Updating preview…
+    preview_unavailable: Preview unavailable
+    generated: Generated
+    plain: plain
+    remove: Remove element
+    max_elements: An ID format can contain up to ten elements.
+    element_help_title: About this element
+    help_button: Show help for this element type
+    kinds:
+      fixed: Fixed text
+      random_20: 20-bit random
+      random_32: 32-bit random
+      random_6: 6-digit random
+      random_9: 9-digit random
+      guid: GUID
+      datetime: Date / time
+      sequence: Sequence
+    help:
+      fixed: Any Unicode text, such as LAB- or 2026/
+      guid_format: Hyphenated uses 8-4-4-4-12; compact uses 32 hexadecimal characters.
+      datetime_format: Use a strftime pattern, for example %Y%m%d for 20261115.
+      padding: Numeric padding adds leading zeroes, for example 0007.
+      random_20: A number from 0 to 1,048,575.
+      random_32: A number from 0 to 4,294,967,295.
+      random_6: A number from 0 to 999,999.
+      random_9: A number from 0 to 999,999,999.
+      guid: A globally unique identifier in hyphenated or compact form.
+      datetime: The creation time, formatted with a strftime pattern such as %Y%m%d.
+      sequence: The next number after the largest sequence already used in this inventory.
+    guid_format: GUID format
+    datetime_format: Date format
+    padding: Leading-zero padding
+    save: Save ID format
+    preview_label: Live preview
+    preview_heading: Your next item ID
+    preview_help: The server renders this with the same rules used when an item is
+      created.
+    preview_waiting: Waiting for a format…
+    help_title: Formatting help
+    saved: The format of the custom ids was saved.
+    not_allowed: You are not allowed to change the custom ids of this inventory.
+    error_message: does not match the format %{pattern}
+    duplicate: Could not generate a free custom id, please write one yourself.
+  fields:
+    form:
+      title: Title
+      title_placeholder: e.g. Model or Purchase year
+      description: Description / hint
+      description_placeholder: Optional guidance shown beside the field.
+      type: Field type
+      choose_type: Choose a type
+      type_hint: Use a single-line field for short values and a multi-line field for
+        notes.
+      show_in_table: Show in item table
+      show_in_table_hint: Include this field as a column on the inventory’s items
+        tab.
+      choices: Choices
+      choices_hint: Enter one choice per line.
+      save: Save field
+      add: Add field
+    types:
+      text: Single-line text
+      textarea: Multi-line text
+      number: Number
+      document: Document or image link
+      boolean: True / false
+      select: Choose from a list
+    edit_title: Edit %{field} · %{inventory} · Stockroom
+    back: "← Back to fields"
+    edit_heading: Edit %{field}
+    edit_description: Changes apply to the item form and table for this inventory.
+    details_heading: Field details
+    edit_details_description: Update the label, guidance, type, or table visibility.
+    delete: Delete field
+    delete_confirmation: Delete this field and its values? This cannot be undone.
+    title: Fields · %{inventory} · Stockroom
+    heading: Custom fields
+    description: Define the structured information collected for every item. Drag
+      rows to reorder them, or select a field and use the keyboard-friendly controls
+      above.
+    table_heading: Inventory fields
+    add: Add field
+    move_up: Move up
+    move_down: Move down
+    save_order: Save order
+    delete_selected: Delete selected
+    table_caption: Custom fields for %{inventory}, in display order
+    in_table: In table
+    select: Select %{title}
+    drag_handle: Drag to reorder
+    order_saved: Field order is up to date
+    order_error: Could not save field order
+    empty: No custom fields
+    empty_description: Add text, number, document, or checkbox fields to collect the
+      information your team needs.
+    add_first: Add first field
+    limits_label: Field type limits
+    new_title: New field · %{inventory} · Stockroom
+    add_heading: Add a custom field
+    add_description: Choose the kind of information this field should collect.
+    details_description: A clear title and short hint help everyone enter consistent
+      values.
+    created: The field was created.
+    updated: The field was updated.
+    destroyed: The field was deleted.
+    not_allowed: You are not allowed to change the fields of this inventory.
+  items:
+    form:
+      custom_id: Custom inventory ID
+      custom_id_placeholder: e.g. INV-0007
+      custom_id_hint: The inventory’s current ID rules apply. IDs remain unique inside
+        this inventory.
+      created_by: Created by
+      created_at: Created at
+      document_hint: Link to a document or image.
+      boolean_hint: Select when this applies.
+      choose: Choose…
+      no_fields: No custom fields yet.
+      no_fields_description: The owner can add fields to collect structured information
+        for every item.
+      save: Save item
+      add: Add item
+    item_label: Inventory item
+    from: From
+    table_caption: Items in %{inventory}
+    custom_id: Custom ID
+    no_matches: No matching items
+    clear_filters: Clear the filter to see every item in this inventory.
+    empty: No items yet
+    empty_writable: Add the first item and give this inventory a useful starting point.
+    empty_read_only: Items added by collaborators will appear here.
+    add_first: Add first item
+    edit_title: Edit %{id} · Stockroom
+    back_to_item: "← Back to item"
+    edit_heading: Edit
+    edit_description: Update this item in %{inventory}.
+    details_heading: Item details
+    id_validation_description: The ID is validated against the inventory’s current
+      format.
+    delete: Delete item
+    delete_confirmation: Delete this item permanently? This cannot be undone.
+    inventory_label: Inventory
+    no_description: No description has been added yet.
+    shared_with_all: Shared with all members
+    restricted_access: Restricted access
+    owned_by: Owned by
+    add: Add item
+    read_only: You’re viewing a read-only inventory.
+    sign_in_to_edit: to add or edit items when access allows.
+    heading: Inventory items
+    filter_label: Filter items
+    filter_placeholder: Filter items…
+    new_title: New item · %{inventory} · Stockroom
+    add_heading: Add an item
+    add_description: Enter the custom ID and the information this inventory collects.
+    owner_fields_description: Fields marked by the inventory owner appear here.
+    added_on: Added %{date}
+    added_by: " by %{name}"
+    unlike: Unlike
+    like: Like
+    edit: Edit item
+    details_description: Values collected by this inventory’s custom fields.
+    values_caption: Custom field values for %{id}
+    open_document: Open document
+    no_custom_fields: No custom fields
+    no_custom_fields_description: The owner can add fields to collect structured information
+      for this item.
+    record: Record
+    inventory_id: Inventory ID
+    about_inventory: About this inventory
+    created: The item was created.
+    updated: The item was updated.
+    destroyed: The item was deleted.
+    conflict: This item was changed by somebody else. Please reload the page.
+    not_allowed: You are not allowed to change the items of this inventory.
+    custom_id_taken: This custom id is already used in this inventory. Please choose
+      another one.
+  app:
+    name: Stockroom · Inventory
+    description: A calm, collaborative workspace for cataloguing inventories.
+    layout:
+      skip_to_content: Skip to content
+      search_label: Search inventories, items, and people
+      search_placeholder: Search inventories, items, people…
+      language: Language
+      toggle_theme: Toggle color theme
+      guest: Guest
+      account_menu: Account menu
+      account: Account
+      my_workspace: My workspace
+      administration: Administration
+      sign_out: Sign out
+      sign_in: Sign in
+    languages:
+      english: English
+      spanish: Español
+    footer:
+      tagline: Inventory, without the clutter.
+  auth:
+    get_started: Get started
+    sign_up:
+      heading: Create your account
+      description: Build reusable inventories and collaborate with your team.
+      submit: Create account
+    continue_google: Continue with Google
+    continue_facebook: Continue with Facebook
+    or_email: or use email
+    name: Name
+    email: Email address
+    password: Password
+    password_confirmation: Confirm password
+    have_account: Already have an account?
+    sign_in:
+      link: Sign in
+      heading: Sign in to Stockroom
+      description: Continue to your inventories, shared collections, and discussions.
+      submit: Sign in
+    promise:
+      eyebrow: One calm workspace
+      signup_heading: Give every collection a structure people understand.
+      description: Structured fields, flexible identifiers, and thoughtful access
+        controls—without the clutter.
+      heading: Every collection, exactly as your team sees it.
+    welcome_back: Welcome back
+    no_account: New to Stockroom?
+    create_account: Create an account
+    sign_in_required: Please sign in to continue.
+    admin_required: You are not allowed to access that page.
+  search:
+    title: Search
+    eyebrow: Full-text search
+    results_for: Results for “%{query}”
+    heading: Search Stockroom
+    results_found: results across inventories, items, and people.
+    input_label: Search everything
+    placeholder: Try a title, item ID, field value, or person…
+    submit: Search
+    no_results: No results found
+    no_results_help: Check the spelling or search for a broader term.
+    categories: Search result categories
+    all_results: All
+    inventories: Inventories
+    items: Items
+    people: People
+    inventory_caption: Inventories matching %{query}
+    item_caption: Items matching %{query}
+    people_caption: People matching %{query}
+  users:
+    owned_caption: Inventories owned by %{user}
+    select_inventory: Select %{title}
+    no_matches: No matching inventories
+    clear_filters: Clear the filter to see the complete list.
+    no_owned: No owned inventories
+    no_owned_description: Inventories created by this user will appear here.
+    shared_caption: Inventories this user can contribute to
+    clear_shared_filters: Clear the filter to see every shared inventory.
+    no_shared: No shared inventories
+    no_shared_description: Inventories where this user has write access will appear
+      here.
+    owned_inventory_count: owned inventory
+    owned_inventory_count_plural: owned inventories
+    manage_workspace: Manage my workspace
+    owned_heading: Owned inventories
+    filter_owned: Filter owned inventories…
+    sort_owned: Sort owned inventories
+    default_order: Default order
+    sort_name: Name
+    sort_newest: Newest
+    sort_oldest: Oldest
+    edit_selected: Edit selected
+    delete_confirmation: Delete the selected inventories? This cannot be undone.
+    delete_selected: Delete selected
+    shared_heading: Shared inventories
+    filter_shared: Filter shared inventories…
+    sort_shared: Sort shared inventories

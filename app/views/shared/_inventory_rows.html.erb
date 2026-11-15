@@ -1,0 +1,56 @@
+<% inventories = local_assigns.fetch(:inventories, []) %>
+<% show_creator = local_assigns.fetch(:show_creator, true) %>
+<% empty_title = local_assigns.fetch(:empty_title, t("common.no_inventories", default: "No inventories found")) %>
+<% empty_description = local_assigns.fetch(:empty_description, t("common.no_inventories_description", default: "Try another search or create a new inventory.")) %>
+
+<% if inventories.blank? %>
+  <%= render "shared/empty_state", title: empty_title, description: empty_description, icon: "empty" %>
+<% else %>
+  <div class="table-wrap">
+    <table class="data-table inventory-table">
+      <caption class="sr-only"><%= t("common.inventory_table_caption", default: "Available inventories") %></caption>
+      <thead>
+        <tr>
+          <th scope="col"><%= t("common.inventory", default: "Inventory") %></th>
+          <th scope="col"><%= t("common.description", default: "Description") %></th>
+          <th scope="col"><%= t("common.items", default: "Items") %></th>
+          <% if show_creator %><th scope="col"><%= t("common.owner", default: "Owner") %></th><% end %>
+          <th scope="col"><%= t("common.visibility", default: "Visibility") %></th>
+          <th scope="col"><span class="sr-only"><%= t("common.open", default: "Open") %></span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% inventories.each do |inventory| %>
+          <% creator = inventory.respond_to?(:user) ? inventory.user : inventory.try(:creator) %>
+          <% item_count = inventory.items_count.to_i %>
+          <tr class="data-table__row" data-row-link>
+            <td>
+              <a class="table-primary" href="<%= inventory_path(inventory) %>"><%= inventory.try(:title).presence || inventory.try(:name).presence || t("inventories.untitled", default: "Untitled inventory") %></a>
+              <% category = inventory.try(:category).presence %>
+              <% if category %><span class="table-secondary"><%= category %></span><% end %>
+            </td>
+            <td class="table-description"><%= inventory.try(:description).presence || t("common.no_description", default: "No description") %></td>
+            <td><span class="number-cell"><%= number_with_delimiter(item_count.to_i) %></span></td>
+            <% if show_creator %>
+              <td>
+                <% if creator %>
+                  <% creator_name = creator.respond_to?(:name) ? creator.name.presence : creator.to_s %>
+                  <a class="table-link" href="<%= respond_to?(:user_path) ? user_path(creator) : '/users' %>"><%= creator_name %></a>
+                <% else %>
+                  <span class="muted"><%= t("common.unknown", default: "Unknown") %></span>
+                <% end %>
+              </td>
+            <% end %>
+            <td>
+              <span class="status-pill <%= inventory.try(:public?) ? 'status-pill--public' : 'status-pill--private' %>">
+                <span class="status-pill__dot" aria-hidden="true"></span>
+                <%= inventory.try(:public?) ? t("common.shared", default: "Shared") : t("common.private", default: "Private") %>
+              </span>
+            </td>
+            <td class="table-arrow" aria-hidden="true">›</td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% end %>

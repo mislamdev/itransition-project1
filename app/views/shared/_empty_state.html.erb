@@ -1,0 +1,17 @@
+<% title = local_assigns.fetch(:title, "Nothing here yet") %>
+<% description = local_assigns.fetch(:description, t("common.empty_description", default: "New records will appear here.")) %>
+<% icon = local_assigns.fetch(:icon, "empty") %>
+<div class="empty-state">
+  <div class="empty-state__icon" aria-hidden="true">
+    <% if icon == "search" %>
+      <svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m15.5 15.5 4 4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+    <% else %>
+      <svg viewBox="0 0 24 24"><path d="M5 8.5 12 4l7 4.5v9L12 22l-7-4.5v-9Z" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m5.5 8.7 6.5 3.6 6.5-3.6M12 12.3V22" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>
+    <% end %>
+  </div>
+  <h3><%= title %></h3>
+  <p><%= description %></p>
+  <% if local_assigns[:action_label] && local_assigns[:action_path] %>
+    <a class="button button--primary" href="<%= local_assigns[:action_path] %>"><%= local_assigns[:action_label] %></a>
+  <% end %>
+</div>

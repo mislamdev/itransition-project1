@@ -1,0 +1,68 @@
+<% inventory = local_assigns.fetch(:inventory) %>
+<% items = local_assigns.fetch(:items, inventory.items) %>
+<% visible_fields = local_assigns.fetch(:visible_fields) { @fields || inventory.fields.select(&:show_in_table?).sort_by(&:position) } %>
+
+<% if items.any? %>
+  <div class="table-wrap">
+    <table class="data-table item-table" id="inventory-items-table">
+      <caption class="sr-only"><%= t("items.table_caption", default: "Items in %{inventory}", inventory: inventory.title) %></caption>
+      <thead>
+        <tr>
+          <th scope="col"><%= t("items.custom_id", default: "Custom ID") %></th>
+          <% visible_fields.each do |field| %>
+            <th scope="col"><%= field.title %></th>
+          <% end %>
+          <th scope="col"><%= t("common.likes", default: "Likes") %></th>
+          <th scope="col"><%= t("common.added", default: "Added") %></th>
+          <th scope="col"><span class="sr-only"><%= t("common.open_item", default: "Open item") %></span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% items.each do |item| %>
+          <% searchable_values = visible_fields.filter_map { |field| item.value_for(field).to_s }.join(" ") %>
+          <tr class="data-table__row" data-row-link data-filter-text="<%= [item.custom_id, searchable_values].join(' ').downcase %>">
+            <td><a class="item-id" href="<%= item_path(item) %>"><%= item.custom_id %></a></td>
+            <% visible_fields.each do |field| %>
+              <td>
+                <% value = item.value_for(field) %>
+                <% if field.field_type == "document" && value.present? %>
+                  <a class="table-link" href="<%= value %>" target="_blank" rel="noopener noreferrer"><%= value.to_s.split('/').last %></a>
+                <% elsif field.field_type == "boolean" %>
+                  <span class="status-pill <%= value ? 'status-pill--public' : 'status-pill--private' %>">
+                    <span class="status-pill__dot" aria-hidden="true"></span>
+                    <%= value ? t("common.yes", default: "Yes") : t("common.no", default: "No") %>
+                  </span>
+                <% else %>
+                  <span class="item-value" title="<%= value %>"><%= value.presence || "—" %></span>
+                <% end %>
+              </td>
+            <% end %>
+            <td>
+              <span class="likes-count">
+                <span class="likes-count__icon" aria-hidden="true">♥</span>
+                <%= number_with_delimiter(item.likes_count.to_i) %>
+                <span class="sr-only"><%= t("common.likes", default: "likes") %></span>
+              </span>
+            </td>
+            <td><span class="table-secondary"><%= item.created_at&.strftime("%b %-d, %Y") %></span></td>
+            <td class="table-arrow" aria-hidden="true">›</td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+  <div class="empty-state" data-filter-empty hidden>
+    <div class="empty-state__icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M5 8.5 12 4l7 4.5v9L12 22l-7-4.5v-9Z" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m5.5 8.7 6.5 3.6 6.5-3.6M12 12.3V22" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>
+    </div>
+    <h3><%= t("items.no_matches", default: "No matching items") %></h3>
+    <p><%= t("items.clear_filters", default: "Clear the filter to see every item in this inventory.") %></p>
+  </div>
+<% else %>
+  <%= render "shared/empty_state",
+            title: t("items.empty", default: "No items yet"),
+            description: can_write_items?(inventory) ? t("items.empty_writable", default: "Add the first item and give this inventory a useful starting point.") : t("items.empty_read_only", default: "Items added by collaborators will appear here."),
+            icon: "empty",
+            action_label: can_write_items?(inventory) ? t("items.add_first", default: "Add first item") : nil,
+            action_path: can_write_items?(inventory) ? new_inventory_item_path(inventory) : nil %>
+<% end %>
