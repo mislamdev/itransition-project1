@@ -1,0 +1,34 @@
+# Deploy hooks for Stockroom on Cloud 66 for Rails (virtual machines).
+#
+# The hooks are read from ".cloud66/deploy_hooks.yml" in the repository.
+# The container path (Cloud 66 Deploy) does not use them: the entry point of
+# the image prepares the database by itself.
+#
+# See docs/deployment/cloud66.md for the walkthrough.
+
+production:
+  # Runs the pending migrations after the new code has been checked out and
+  # the symlink to the release has been updated.
+  #
+  # Cloud 66 runs "rake db:migrate" on its own during every deployment. The
+  # hook below is only needed when the automatic migrations are switched off
+  # (Toolbelt: "cx settings set --stack stockroom auto_migrate false").
+  after_symlink:
+    - source: /.cloud66/scripts/migrate.sh
+      destination: /tmp/migrate.sh
+      target: rails
+      execute: true
+      run_on: all_servers
+      apply_during: all
+      sudo: false
+
+  # The Bootsnap cache belongs to the user that compiled it. A cache that was
+  # written by another release makes the application boot very slowly.
+  before_restart:
+    - source: /.cloud66/scripts/clear_bootsnap.sh
+      destination: /tmp/clear_bootsnap.sh
+      target: rails
+      execute: true
+      run_on: all_servers
+      apply_during: all
+      sudo: false

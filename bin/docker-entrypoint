@@ -1,8 +1,61 @@
 #!/bin/bash -e
 
-# Prepare the database when the image starts the Rails server.
-if [ "${@: -2:1}" == "./bin/rails" ] && [ "${@: -1:1}" == "server" ]; then
-  ./bin/rails db:prepare
-fi
+# Entry point of the production image.
+#
+# When the image starts the Rails server it makes sure that the database
+# exists and that the schema is up to date before the first request is served.
+
+# Waits for the database to accept connections.
+#
+# The application and the database are separate services that are started at
+# the same time, so the database is often not ready yet when the container
+# starts. A connection string that cannot be parsed is not waited for: there
+# is nothing to wait for in that case (the schema preparation reports the
+# real problem).
+wait_for_database() {
+  local url="$1"
+  local attempts="${DB_WAIT_ATTEMPTS:-30}"
+  local attempt=1
+  local status
+
+  while [ "$attempt" -le "$attempts" ]; do
+    pg_isready -d "$url" -q
+    status=$?
+
+    case "$status" in
+      0) return 0 ;;
+      3) return 0 ;; # invalid invocation: the connection string was not understood
+    esac
+
+    echo "Waiting for the database (attempt ${attempt}/${attempts})..."
+    sleep 2
+    attempt=$((attempt + 1))
+  done
+
+  echo "The database did not become available in time." >&2
+  return 1
+}
+
+# Prepares the database when the image starts the Rails server.
+#
+# The start command may carry extra arguments (the default command is
+# "./bin/rails server -b 0.0.0.0"), so the sub command is looked up in the
+# whole argument list instead of in a fixed position.
+for argument in "$@"; do
+  case "$argument" in
+    server|s)
+      if [ -n "${DATABASE_URL:-}" ]; then
+        # The query string of the URL carries Rails options (for example
+        # "seeds=false"), which libpq does not understand.
+        wait_for_database "${DATABASE_URL%%\?*}"
+      fi
+
+      if [ "${SKIP_DB_PREPARE_ON_BOOT:-false}" != "true" ]; then
+        ./bin/rails db:prepare
+      fi
+      break
+      ;;
+  esac
+done
 
 exec "${@}"

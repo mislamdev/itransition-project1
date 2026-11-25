@@ -1,0 +1,69 @@
+# Cloud 66 Deploy — service definition for Stockroom.
+#
+# Apply it in the Cloud 66 dashboard:
+#   Application -> "More" -> "Edit service.yml" -> paste -> Commit
+#
+# A copy of this file lives in the repository so that the configuration is
+# reviewable; see docs/deployment/cloud66.md for the full walkthrough.
+version: 2
+
+services:
+  web:
+    git_url: https://github.com/mislamdev/itransition-project1.git
+    git_branch: main
+
+    # The image is built from the Dockerfile of the repository. The build
+    # stage installs the gems and precompiles the assets (Propshaft), so no
+    # Node toolchain is needed on the servers.
+    dockerfile_path: Dockerfile
+
+    # The container listens on 3000 (see config/puma.rb and the Dockerfile).
+    ports:
+      - container: 3000
+        http: 80
+        https: 443
+
+    # Kubernetes probes. The startup probe gives a cold container enough time
+    # to boot and to prepare the database before the liveness probe may
+    # restart it. The readiness probe is what makes the rollout zero downtime.
+    health:
+      startup:
+        type: http
+        endpoint: /up
+        port: 3000
+        initial_delay: 20
+        period: 5
+        failure_threshold: 30
+      ready:
+        type: http
+        endpoint: /up
+        port: 3000
+        initial_delay: 10
+        period: 5
+        failure_threshold: 3
+      alive:
+        type: http
+        endpoint: /up
+        port: 3000
+        initial_delay: 30
+        period: 10
+        failure_threshold: 3
+
+    # The managed database of the application. Cloud 66 provisions it and
+    # publishes the credentials as environment variables.
+    databases:
+      - postgresql
+
+    # The entry point of the image already runs "bin/rails db:prepare" before
+    # Puma starts. Uncomment the line below to run the schema preparation
+    # from Cloud 66 instead, and add "SKIP_DB_PREPARE_ON_BOOT=true" to the
+    # environment variables of the application.
+    # deploy_command: bin/rails db:prepare
+
+    # The application logs to STDOUT (see config/environments/production.rb),
+    # so Cloud 66 picks the container output up as the application log.
+
+    security_context:
+      run_as_user: 1000
+      run_as_group: 1000
+      fs_group: 1000

@@ -77,6 +77,16 @@ RAILS_MASTER_KEY=...
 
 `config/master.key` is intentionally ignored by Git. Supply `RAILS_MASTER_KEY` or `SECRET_KEY_BASE` in production.
 
+Behind a TLS terminating proxy (Nginx, Cloud 66, a load balancer) the application
+needs two more variables, otherwise it treats the proxied request as plain HTTP:
+
+```bash
+ASSUME_SSL=true   # the proxy forwards X-Forwarded-Proto: https
+FORCE_SSL=true    # secure cookies and Strict-Transport-Security
+APP_HOST=stockroom.example.com          # used for generated links
+APP_HOSTS=stockroom.example.com         # optional: accepted Host headers
+```
+
 ### Google and Facebook sign-in
 
 Providers are enabled only when their credentials exist:
@@ -158,7 +168,38 @@ docker run --rm -p 3000:3000 \
   stockroom
 ```
 
-The entrypoint runs `db:prepare` before starting Puma. Supply `RAILS_MASTER_KEY` instead of `SECRET_KEY_BASE` when encrypted credentials are required.
+The entrypoint runs `db:prepare` before starting Puma: it waits for the
+database to accept connections, creates the schema from `db/structure.sql`
+when it is missing and runs the pending migrations afterwards. Supply
+`RAILS_MASTER_KEY` instead of `SECRET_KEY_BASE` when encrypted credentials are
+required.
+
+Append `?seeds=false` to the database URL to keep the demo accounts of
+`db/seeds.rb` out of a fresh database:
+
+```bash
+DATABASE_URL="postgres://user:password@host/database?seeds=false"
+```
+
+## Deployment on Cloud 66
+
+[`docs/deployment/cloud66.md`](docs/deployment/cloud66.md) is the complete
+guide for deploying Stockroom to [Cloud 66](https://www.cloud66.com):
+
+- **Cloud 66 Deploy** (recommended): the application is built from the
+  `Dockerfile` and runs on a managed Kubernetes cluster.
+- **Cloud 66 for Rails**: the application is installed on a virtual machine
+  and served with Puma.
+
+The configuration that belongs to Cloud 66 lives in the repository:
+
+| File | Purpose |
+|---|---|
+| `config/cloud66/service.yml` | Service definition of the container (ports, health probes, database) |
+| `config/cloud66/env.vars.example` | Template for the environment variables of the application |
+| `.cloud66/manifest.yml` | Pinned Ruby and PostgreSQL versions, health check, ActiveProtect settings |
+| `.cloud66/deploy_hooks.yml` | Migration hook of the virtual machine path |
+| `Procfile` | Puma web process of the virtual machine path |
 
 ## Localization
 

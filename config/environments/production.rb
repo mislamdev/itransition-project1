@@ -22,13 +22,18 @@ Rails.application.configure do
   # config.asset_host = "http://assets.example.com"
 
   # Assume all access to the app is happening through a SSL-terminating reverse proxy.
-  # config.assume_ssl = true
+  #
+  # Cloud 66 terminates TLS in Nginx and forwards plain HTTP to the app, so the
+  # proxy sends `X-Forwarded-Proto: https`. Without `assume_ssl` Rails would
+  # believe the request was plain HTTP and would build http:// URLs.
+  config.assume_ssl = ENV.fetch("ASSUME_SSL", "false") == "true"
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
-  # config.force_ssl = true
+  # Set FORCE_SSL=true in the production environment (see docs/deployment/cloud66.md).
+  config.force_ssl = ENV.fetch("FORCE_SSL", "false") == "true"
 
   # Skip http-to-https redirect for the default health check endpoint.
-  # config.ssl_options = { redirect: { exclude: ->(request) { request.path == "/up" } } }
+  config.ssl_options = { redirect: { exclude: ->(request) { request.path == "/up" } } }
 
   # Log to STDOUT with the current request id as a default log tag.
   config.log_tags = [ :request_id ]
@@ -54,7 +59,10 @@ Rails.application.configure do
   # config.action_mailer.raise_delivery_errors = false
 
   # Set host to be used by links generated in mailer templates.
-  config.action_mailer.default_url_options = { host: "example.com" }
+  config.action_mailer.default_url_options = {
+    host: ENV.fetch("APP_HOST", "example.com"),
+    protocol: ENV.fetch("APP_PROTOCOL", "https")
+  }
 
   # Specify outgoing SMTP server. Remember to add smtp/* credentials via bin/rails credentials:edit.
   # config.action_mailer.smtp_settings = {
@@ -82,5 +90,13 @@ Rails.application.configure do
   # ]
   #
   # Skip DNS rebinding protection for the default health check endpoint.
-  # config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
+  config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
+
+  # Enable DNS rebinding protection and other `Host` header attacks.
+  #
+  # APP_HOSTS is a comma separated list of hostnames that are allowed to reach
+  # the application (for example "stockroom.example.com,www.example.com").
+  # When it is empty every host is accepted, which is the historical behaviour.
+  allowed_hosts = ENV.fetch("APP_HOSTS", "").split(",").map(&:strip).reject(&:empty?)
+  config.hosts = allowed_hosts if allowed_hosts.any?
 end

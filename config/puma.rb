@@ -29,7 +29,19 @@ threads_count = ENV.fetch("RAILS_MAX_THREADS", 3)
 threads threads_count, threads_count
 
 # Specifies the `port` that Puma will listen on to receive requests; default is 3000.
-port ENV.fetch("PORT", 3000)
+#
+# Cloud 66 (the Rails product) expects the application server to listen on a
+# Unix socket instead. Set CUSTOM_WEB_SOCKET_FILE to switch to that mode; when
+# the variable is absent the TCP port is used, as usual.
+#
+# Puma reads this file before Rails is loaded, so it only uses plain Ruby.
+socket_file = ENV["CUSTOM_WEB_SOCKET_FILE"].to_s
+
+if socket_file.empty?
+  port ENV.fetch("PORT", 3000)
+else
+  bind "unix://#{File.expand_path(socket_file)}"
+end
 
 # Allow puma to be restarted by `bin/rails restart` command.
 plugin :tmp_restart
@@ -38,5 +50,12 @@ plugin :tmp_restart
 plugin :solid_queue if ENV["SOLID_QUEUE_IN_PUMA"]
 
 # Specify the PID file. Defaults to tmp/pids/server.pid in development.
-# In other environments, only set the PID file if requested.
-pidfile ENV["PIDFILE"] if ENV["PIDFILE"]
+# In other environments, only set the pid file if requested.
+pid_file = ENV["CUSTOM_WEB_PID_FILE"].to_s
+pid_file = ENV["PIDFILE"].to_s if pid_file.empty?
+pidfile pid_file unless pid_file.empty?
+
+# Cloud 66 runs the application from a release directory that changes on every
+# deployment; pointing Puma at it makes the workers pick up the new code.
+stack_path = ENV["STACK_PATH"].to_s
+directory stack_path unless stack_path.empty?

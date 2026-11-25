@@ -1,0 +1,52 @@
+# Cloud 66 manifest for Stockroom.
+#
+# Cloud 66 reads this file from ".cloud66/manifest.yml" in the repository and
+# applies it on the next deployment. It pins the versions of the components
+# so that new servers are always built the same way.
+#
+# See docs/deployment/cloud66.md for the walkthrough.
+
+production:
+  rails:
+    configuration:
+      # The Ruby version of .ruby-version. Cloud 66 installs Ruby from its own
+      # catalogue: if this version is not available for your Ubuntu release,
+      # deploy the application as a container instead (Cloud 66 Deploy).
+      ruby_version: 4.0.5
+
+      # The application compiles its assets (Propshaft) during the deployment.
+      asset_pipeline_enabled: true
+      asset_pipeline_precompile: true
+
+      # The deployment is only successful when the application answers on its
+      # health endpoint.
+      health_check:
+        protocol: 'http'
+        host: 'localhost'
+        port: 80
+        endpoint: '/up'
+        accept: ["200"]
+        follow_redirects: true
+        timeout: 30
+
+  postgresql:
+    configuration:
+      # The schema uses generated tsvector columns and GIN indexes, so the
+      # PostgreSQL version must not change under the application.
+      version: 16
+
+  docker:
+    configuration:
+      activeprotect:
+        health_check:
+          endpoint: '/up'
+          accept: ["200"]
+          timeout: 5
+          max_redirects: 3
+          cooldown: 60
+
+  # The signals that are used to restart the web server. USR1 lets Puma do a
+  # phased restart, which keeps the site available during a deployment.
+  procfile_metadata:
+    custom_web:
+      restart_signal: usr1
