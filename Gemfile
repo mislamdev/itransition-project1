@@ -59,6 +59,10 @@ group :development, :test do
 end
 
 group :development do
+  # Reads the local .env file (see .env.example). The file is only read in
+  # the development environment, never in production.
+  gem "dotenv-rails"
+
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
 end

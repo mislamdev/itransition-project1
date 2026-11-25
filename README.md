@@ -67,13 +67,19 @@ Change or remove these credentials before deploying publicly.
 
 ## Configuration
 
-Copy `.env.example` to `.env` and set only the values you need. The most important production settings are:
+Copy `.env.example` to `.env` and set only the values you need. The file is
+read in the development environment (the `dotenv-rails` gem); in production
+the variables come from the environment of the server. The most important
+production settings are:
 
 ```bash
-DATABASE_URL=postgres://user:password@host/inventory_management_production
+DATABASE_URL=postgres://user:password@host/inventory_management_production?seeds=false
 SECRET_KEY_BASE=...
 RAILS_MASTER_KEY=...
 ```
+
+`?seeds=false` keeps `db/seeds.rb` out of a fresh database — the demo
+accounts of the seeds file have public passwords.
 
 `config/master.key` is intentionally ignored by Git. Supply `RAILS_MASTER_KEY` or `SECRET_KEY_BASE` in production.
 

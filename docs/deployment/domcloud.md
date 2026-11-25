@@ -81,6 +81,30 @@ bundle exec rails runner 'u = User.find_or_initialize_by(email: "admin@example.c
 
 Then sign in with that address and change the password in the settings.
 
+### The OAuth credentials
+
+`~/stockroom.env` is rewritten by every deployment, so it is not the place
+for the credentials of the providers. Put them into `~/stockroom.extra.env`,
+which the generated file includes if it exists:
+
+```bash
+cat > ~/stockroom.extra.env <<'EOF'
+export GOOGLE_OAUTH_CLIENT_ID=...
+export GOOGLE_OAUTH_CLIENT_SECRET=...
+export FACEBOOK_APP_ID=...
+export FACEBOOK_APP_SECRET=...
+EOF
+```
+
+Afterwards the application has to be restarted:
+
+```bash
+passenger-config restart-app ~
+```
+
+The callback URLs are `https://<domain>/auth/google_oauth2/callback` and
+`https://<domain>/auth/facebook/callback`.
+
 ## 4. Everyday work
 
 | Task | Command (over SSH) |

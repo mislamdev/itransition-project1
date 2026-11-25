@@ -96,9 +96,13 @@ commands:
         echo "export ASSUME_SSL=true"
         echo "export APP_HOST=\"$domain\""
         echo "export APP_HOSTS=\"$domain\""
+        echo "export APP_PROTOCOL=https"
         echo "export RAILS_MAX_THREADS=5"
         echo "export RAILS_LOG_LEVEL=info"
         echo "export PATH=\"\$HOME/.rvm/rubies/default/bin:\$PATH\""
+        # The file is written by hand and survives every deployment: the
+        # OAuth credentials of the providers belong into it.
+        echo "if [ -f \"\$HOME/stockroom.extra.env\" ]; then . \"\$HOME/stockroom.extra.env\"; fi"
       } > "$env_file"
 
       chmod 0600 "$env_file"

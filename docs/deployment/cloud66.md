@@ -127,7 +127,7 @@ They are only applied on the next deployment.
 | Variable | Value | Why |
 |---|---|---|
 | `RAILS_ENV` | `production` | Set by Cloud 66 for the production environment. |
-| `SECRET_KEY_BASE` | `AUTO_GENERATE_64` | Cloud 66 replaces the placeholder with a random string at deploy time. Use `AUTO_GENERATE_<n>` to choose the length. |
+| `SECRET_KEY_BASE` | a fixed random value (`openssl rand -hex 64`) | It signs the session cookies, so it has to stay the same over the deployments. The `AUTO_GENERATE_64` placeholder of Cloud 66 is replaced with a **new** value on every deployment, which would log every user out. |
 | `DATABASE_URL` | `postgres://...?seeds=false` | The managed database. Prefer the variable Cloud 66 generates; add `?seeds=false`. |
 | `ASSUME_SSL` | `true` | Nginx terminates TLS and forwards plain HTTP with `X-Forwarded-Proto: https`. Without this flag Rails believes the request was plain HTTP and builds `http://` URLs. |
 | `FORCE_SSL` | `true` | Secure cookies and HSTS. The HTTP → HTTPS redirect itself is done by the Cloud 66 Nginx, because the application only ever sees the internal HTTP request. |
