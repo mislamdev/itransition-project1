@@ -1,0 +1,126 @@
+# DOM Cloud deployment script for Stockroom.
+#
+# How to use it:
+#   1. Point the domain of the website at DOM Cloud.
+#   2. Open the website in the DOM Cloud portal -> Setup -> Deploy.
+#   3. Paste this file into the deployment editor and run the task.
+#
+# The script clones the repository, installs the gems, prepares the
+# PostgreSQL database, compiles the assets and serves the application with
+# Passenger.
+
+source:
+  url: https://github.com/mislamdev/itransition-project1.git
+  type: clone
+  branch: main
+  depth: shallow
+
+features:
+  # Ruby 4.0.5 with RVM. DOM Cloud ships a prebuilt version of it, so the
+  # installation takes seconds instead of compiling it from the source. This
+  # is the version of .ruby-version.
+  - ruby 4.0.5
+
+  # The managed PostgreSQL server of DOM Cloud. It provides $DATABASE (the
+  # name of the database) and $PGPASSWD (the password) to the commands
+  # below.
+  - postgresql
+
+  # A Let's Encrypt certificate and a permanent redirect to HTTPS.
+  # The domain has to point at DOM Cloud before the certificate can be
+  # issued. "ssl letsencrypt" asks for the certificate, "ssl always" sends
+  # every HTTP request to HTTPS.
+  - ssl letsencrypt
+  - ssl always
+
+nginx:
+  root: public_html/public
+  passenger:
+    enabled: "on"
+    app_env: production
+    app_root: public_html
+    ruby: .rvm/rubies/default/bin/ruby
+    # The application is started by run.sh, which loads the environment file
+    # first. Passenger sets the PORT variable, the application has to listen
+    # on it (see config/puma.rb).
+    app_start_command: bash run.sh
+
+commands:
+  # The Procfile of the repository belongs to the Cloud 66 deployment.
+  # Passenger would otherwise start Puma with the wrong socket.
+  - rm -f Procfile
+
+  # The environment of the application.
+  #
+  # It is written outside of public_html, because public_html is emptied on
+  # every deployment. The secret key base is kept, so that the sessions of
+  # the users survive a deployment.
+  - filename: domcloud_env.sh
+    content: |
+      #!/bin/bash
+      set -e
+
+      env_file="$HOME/stockroom.env"
+
+      secret_key_base="$(grep -m1 '^export SECRET_KEY_BASE=' "$env_file" 2>/dev/null | cut -d'"' -f2 || true)"
+      if [ -z "$secret_key_base" ]; then
+        secret_key_base="$(openssl rand -hex 64)"
+      fi
+
+      {
+        echo "export SECRET_KEY_BASE=\"$secret_key_base\""
+        # "seeds=false" keeps db/seeds.rb out of the database: the demo
+        # accounts of the seeds file have public passwords.
+        echo "export DATABASE_URL=\"postgresql://$USERNAME:$PGPASSWD@localhost:5432/$DATABASE?seeds=false\""
+        echo "export RAILS_ENV=production"
+        echo "export RACK_ENV=production"
+        # DOM Cloud terminates TLS in NGINX and forwards the request with
+        # "X-Forwarded-Proto: https".
+        echo "export FORCE_SSL=true"
+        echo "export ASSUME_SSL=true"
+        echo "export APP_HOST=\"$DOMAIN\""
+        echo "export APP_HOSTS=\"$DOMAIN\""
+        echo "export RAILS_MAX_THREADS=5"
+        echo "export RAILS_LOG_LEVEL=info"
+        echo "export PATH=\"\$HOME/.rvm/rubies/default/bin:\$PATH\""
+      } > "$env_file"
+
+      chmod 0600 "$env_file"
+      echo "wrote $env_file"
+
+  - bash domcloud_env.sh
+
+  # The start script of the application.
+  - filename: run.sh
+    content: |
+      #!/bin/bash
+      set -e
+
+      . "$HOME/stockroom.env"
+
+      # Passenger sets PORT; config/puma.rb listens on it.
+      exec bundle exec puma
+
+  - chmod +x run.sh
+
+  # The bundler of Gemfile.lock (4.0.23). Ruby 4.0.5 may ship with an older
+  # bundler, and the binstub of bundler switches to the version of the lock
+  # file by itself.
+  - bundler_version="$(awk '/BUNDLED WITH/{getline; print $1}' Gemfile.lock)"; gem install bundler -v "${bundler_version:-4.0.23}" --no-document
+
+  # The gems. The development and the test groups are not needed in
+  # production. The native gems (pg, nokogiri, commonmarker, thruster) are
+  # installed as prebuilt packages, so nothing has to be compiled.
+  - . "$HOME/stockroom.env" && bundle config set --local without "development test" && bundle install --jobs 4 --retry 3
+
+  # The schema of the database. "db:prepare" loads db/structure.sql when the
+  # database is still empty (it contains the full text search columns and
+  # the GIN indexes) and runs the pending migrations afterwards.
+  - . "$HOME/stockroom.env" && bundle exec rails db:prepare
+
+  # The assets (Propshaft). They are served by NGINX from public/assets.
+  - . "$HOME/stockroom.env" && bundle exec rails assets:precompile
+
+  # The application of the previous deployment is still running, so it has
+  # to be restarted to serve the new code.
+  - passenger-config restart-app ~ || true

@@ -201,6 +201,19 @@ The configuration that belongs to Cloud 66 lives in the repository:
 | `.cloud66/deploy_hooks.yml` | Migration hook of the virtual machine path |
 | `Procfile` | Puma web process of the virtual machine path |
 
+## Deployment on DOM Cloud
+
+[`docs/deployment/domcloud.md`](docs/deployment/domcloud.md) describes the
+deployment on [DOM Cloud](https://domcloud.co), where the application runs on
+a shared Rocky Linux server with NGINX and Passenger. The whole deployment is
+one YAML script:
+
+[`config/domcloud/deploy.yml`](config/domcloud/deploy.yml)
+
+It clones the repository, installs Ruby 4.0.5 with RVM, creates the managed
+PostgreSQL database, installs the gems, prepares the schema, compiles the
+assets and serves the application with Puma.
+
 ## Localization
 
 The generated locale files are committed so the interface is deployable immediately:
