@@ -19,7 +19,7 @@ gem "stimulus-rails"
 gem "bcrypt", "~> 3.1"
 
 # External account authentication (Google + Facebook) [https://github.com/omniauth/omniauth]
-gem "omniauth", "~> 2.1"
+gem "omniauth", "~> 2.4"
 gem "omniauth-google-oauth2"
 gem "omniauth-facebook"
 # Required for OmniAuth 2.0+ on POST /auth/:provider [https://github.com/omniauth/omniauth-rails_csrf_protection]
