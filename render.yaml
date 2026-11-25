@@ -1,27 +1,26 @@
 # Render Blueprint for Stockroom.
 #
-# The blueprint creates the web service and the PostgreSQL database in one
-# step:
+# The blueprint creates the web service (from the Dockerfile of the
+# repository) and the PostgreSQL database in one step:
 #
 #   1. Push this file to the repository.
 #   2. In the Render dashboard: New -> Blueprint -> select the repository.
-#   3. Render asks for the value of SECRET_KEY_BASE: generate one with
-#      "openssl rand -hex 64" and paste it.
+#   3. Render asks for the values that are marked with "sync: false".
 #
 # The database and the web service have to be in the same region.
 
 services:
   - type: web
     name: stockroom
-    runtime: ruby
+    runtime: docker
     plan: free
     branch: main
 
-    buildCommand: ./bin/render-build.sh
-    # The pre-deploy command needs a paid compute plan. On the free plan the
-    # migrations run as part of the build command.
-    # preDeployCommand: ./bin/rails db:migrate
-    startCommand: ./bin/rails server
+    # The image of the repository: the gems and the assets are compiled
+    # while it is built, the entry point prepares the database and starts
+    # Puma on 0.0.0.0:$PORT.
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
 
     # The application answers on /up with 200 as soon as it is booted.
     healthCheckPath: /up
@@ -36,11 +35,6 @@ services:
       # same over the deployments, so it is not generated for every deploy.
       - key: SECRET_KEY_BASE
         sync: false
-
-      # Render picks the number of workers from the CPUs of the instance,
-      # which can be too many for a small plan.
-      - key: WEB_CONCURRENCY
-        value: 2
 
       - key: RAILS_LOG_LEVEL
         value: info
@@ -57,6 +51,14 @@ services:
       - key: APP_HOST
         sync: false
       - key: APP_HOSTS
+        sync: false
+
+      # The first administrator of the empty database. The entry point of
+      # the container creates the account when it starts. An account that
+      # exists already is only promoted, its password is never changed.
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
         sync: false
 
       # The sign in with Google and Facebook is only enabled when both

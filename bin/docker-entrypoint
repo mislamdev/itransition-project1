@@ -53,6 +53,14 @@ for argument in "$@"; do
       if [ "${SKIP_DB_PREPARE_ON_BOOT:-false}" != "true" ]; then
         ./bin/rails db:prepare
       fi
+
+      # The first administrator of a fresh database. The demo data of
+      # db/seeds.rb is not loaded in production, so the account is created
+      # here. An account that exists already is only promoted, its password
+      # is never changed.
+      if [ -n "${ADMIN_EMAIL:-}" ] && [ -n "${ADMIN_PASSWORD:-}" ]; then
+        ./bin/rails admin:create
+      fi
       break
       ;;
   esac

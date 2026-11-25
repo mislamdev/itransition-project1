@@ -223,14 +223,18 @@ assets and serves the application with Puma.
 ## Deployment on Render
 
 [`docs/deployment/render.md`](docs/deployment/render.md) describes the
-deployment on [Render](https://render.com), either with the native Ruby
-runtime or with the `Dockerfile` of the repository. The configuration lives
-in two files:
+deployment on [Render](https://render.com). The application runs as a
+container built from the `Dockerfile` of the repository:
 
 | File | Purpose |
 |---|---|
 | `render.yaml` | Blueprint: the web service and the PostgreSQL database |
-| `bin/render-build.sh` | Build command: gems, assets and database |
+| `bin/render-build.sh` | Build command of the native Ruby runtime |
+| `bin/docker-entrypoint` | Prepares the database and starts Puma on `$PORT` |
+
+The `bin/rails admin:create` task creates the first administrator of an
+empty database (the entry point of the container calls it when
+`ADMIN_EMAIL` and `ADMIN_PASSWORD` are set).
 
 ## Localization
 
