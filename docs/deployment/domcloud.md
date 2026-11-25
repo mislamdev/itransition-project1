@@ -68,6 +68,10 @@ file contains demo accounts with public passwords (`admin@example.com` /
 `administrator`). The Rails option `seeds=false` in the database URL switches
 that off, so a production database never receives them.
 
+The seeds file also stops itself in the production environment
+(`RAILS_ENV=production`), so the demo data stays out even if the option is
+missing. `ALLOW_SEEDS=true` loads it anyway.
+
 ## 3. The first administrator
 
 The database is empty after the deployment, so create the first account over

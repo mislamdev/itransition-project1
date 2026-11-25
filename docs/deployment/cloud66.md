@@ -118,6 +118,8 @@ Two properties of the application matter for the deployment:
    `db:prepare` only loads `db/seeds.rb` when it has to create the database,
    and `seeds=false` switches that off. The demo data (including the
    `admin@example.com` / `administrator` account) is then never created.
+   The seeds file also stops itself in the production environment, so the
+   demo data stays out even without the option.
 
 ### 3.3 Environment variables
 

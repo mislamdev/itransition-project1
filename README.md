@@ -220,6 +220,18 @@ It clones the repository, installs Ruby 4.0.5 with RVM, creates the managed
 PostgreSQL database, installs the gems, prepares the schema, compiles the
 assets and serves the application with Puma.
 
+## Deployment on Render
+
+[`docs/deployment/render.md`](docs/deployment/render.md) describes the
+deployment on [Render](https://render.com), either with the native Ruby
+runtime or with the `Dockerfile` of the repository. The configuration lives
+in two files:
+
+| File | Purpose |
+|---|---|
+| `render.yaml` | Blueprint: the web service and the PostgreSQL database |
+| `bin/render-build.sh` | Build command: gems, assets and database |
+
 ## Localization
 
 The generated locale files are committed so the interface is deployable immediately:

@@ -1,0 +1,75 @@
+# Render Blueprint for Stockroom.
+#
+# The blueprint creates the web service and the PostgreSQL database in one
+# step:
+#
+#   1. Push this file to the repository.
+#   2. In the Render dashboard: New -> Blueprint -> select the repository.
+#   3. Render asks for the value of SECRET_KEY_BASE: generate one with
+#      "openssl rand -hex 64" and paste it.
+#
+# The database and the web service have to be in the same region.
+
+services:
+  - type: web
+    name: stockroom
+    runtime: ruby
+    plan: free
+    branch: main
+
+    buildCommand: ./bin/render-build.sh
+    # The pre-deploy command needs a paid compute plan. On the free plan the
+    # migrations run as part of the build command.
+    # preDeployCommand: ./bin/rails db:migrate
+    startCommand: ./bin/rails server
+
+    # The application answers on /up with 200 as soon as it is booted.
+    healthCheckPath: /up
+
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: stockroom-db
+          property: connectionString
+
+      # The secret key base signs the session cookies. It has to stay the
+      # same over the deployments, so it is not generated for every deploy.
+      - key: SECRET_KEY_BASE
+        sync: false
+
+      # Render picks the number of workers from the CPUs of the instance,
+      # which can be too many for a small plan.
+      - key: WEB_CONCURRENCY
+        value: 2
+
+      - key: RAILS_LOG_LEVEL
+        value: info
+
+      # Render terminates TLS and forwards the request with
+      # "X-Forwarded-Proto: https".
+      - key: ASSUME_SSL
+        value: "true"
+      - key: FORCE_SSL
+        value: "true"
+
+      # The public name of the application. The .onrender.com address works
+      # out of the box, a custom domain needs its own value.
+      - key: APP_HOST
+        sync: false
+      - key: APP_HOSTS
+        sync: false
+
+      # The sign in with Google and Facebook is only enabled when both
+      # values of a pair are present.
+      - key: GOOGLE_OAUTH_CLIENT_ID
+        sync: false
+      - key: GOOGLE_OAUTH_CLIENT_SECRET
+        sync: false
+      - key: FACEBOOK_APP_ID
+        sync: false
+      - key: FACEBOOK_APP_SECRET
+        sync: false
+
+databases:
+  - name: stockroom-db
+    plan: free

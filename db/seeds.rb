@@ -7,6 +7,15 @@
 #
 # The demo data makes the application show something right away: a few
 # users, a few inventories with fields and items.
+#
+# The accounts of this file have public passwords, so the file stops itself
+# in the production environment. Set ALLOW_SEEDS=true to load it anyway (in
+# a staging environment, for example).
+if Rails.env.production? && ENV["ALLOW_SEEDS"] != "true"
+  puts "The seeds are skipped in the production environment. Set ALLOW_SEEDS=true to load them."
+  exit
+end
+
 categories = {
   "Equipment" => 1,
   "Furniture" => 2,
