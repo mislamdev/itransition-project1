@@ -10,7 +10,10 @@ The complete script lives in [`config/domcloud/deploy.yml`](../../config/domclou
 
 1. **Point the domain at DOM Cloud.** The deployment asks Let's Encrypt for a
    certificate, which only works when the domain already points to the
-   server.
+   server. The IP address is shown in the portal. If the domain does not
+   resolve yet, the certificate is skipped (the log says `none of the
+   certificate names could be resolved!`) and the site stays on HTTP until
+   you run the deployment again.
 2. **Create the website** in the [DOM Cloud portal](https://my.domcloud.co).
    The plan decides which features are available; the PostgreSQL database and
    the SSL certificate need a paid plan.
@@ -37,6 +40,11 @@ The commands run in this order:
    application. The file is outside of `public_html` (which is emptied on
    every deployment) and it keeps the `SECRET_KEY_BASE`, so that the
    sessions of the users survive a deployment.
+   The variables of DOM Cloud (`$USERNAME`, `$PGPASSWD`, `$DATABASE`,
+   `$DOMAIN`) are **not exported** by the deployment shell: they are plain
+   shell variables. A command sees them, but a script that runs in its own
+   process does not. The script therefore receives them as arguments
+   (`bash domcloud_env.sh "$USERNAME" "$PGPASSWD" "$DATABASE" "$DOMAIN"`).
 3. `run.sh` — the start command of Passenger. It loads `~/stockroom.env`
    and runs `bundle exec puma`; `config/puma.rb` listens on the `PORT`
    variable that Passenger sets.
@@ -94,6 +102,9 @@ minutes.
 | Symptom | Cause | Fix |
 |---|---|---|
 | `❌ Error 1: failed at line ...` in the deployment log | A command failed | The log names the failing line. The most common cause is a missing database: check that the `postgresql` feature is enabled. |
+| `PG::ConnectionNotEstablished: ... fe_sendauth: no password supplied` | The database URL was written without a password | The variables of DOM Cloud are not exported, so a script in its own process does not see `$PGPASSWD`. Pass them as arguments (see the script of this repository) and check `~/stockroom.env`. |
+| `The PostgreSQL credentials are missing.` | The `postgresql` feature is not enabled | Add `- postgresql` to the features and run the deployment again. The database name is `$DATABASE`, the password is `$PGPASSWD`; both are shown in the portal under *Setup → Database*. |
+| `none of the certificate names could be resolved!` | The domain does not point at DOM Cloud (yet) | The certificate is skipped, the site stays on HTTP. Point the domain at the IP address of the server (the portal shows it), wait until it resolves (`dig <domain>`) and run the deployment again. |
 | The site shows the Passenger error page | The application does not start | `passenger-status` shows the reason. Usually a missing gem: run `bundle install` over SSH. |
 | `PG::UndefinedTable: relation "inventories" does not exist` | The schema was never created | Run `bundle exec rails db:prepare` over SSH. |
 | `cannot load such file -- rack (LoadError)` | The rack gem is missing | `gem install rack` (the application itself does not need it; Passenger does). |

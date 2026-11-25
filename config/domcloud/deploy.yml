@@ -55,10 +55,26 @@ commands:
   # It is written outside of public_html, because public_html is emptied on
   # every deployment. The secret key base is kept, so that the sessions of
   # the users survive a deployment.
+  #
+  # The variables of DOM Cloud ($USERNAME, $PGPASSWD, $DATABASE, $DOMAIN) are
+  # shell variables of the deployment shell and are not exported. A script
+  # that runs in its own process would not see them, so they are passed as
+  # arguments.
   - filename: domcloud_env.sh
     content: |
       #!/bin/bash
       set -e
+
+      username="$1"
+      password="$2"
+      database="$3"
+      domain="$4"
+
+      if [ -z "$password" ] || [ -z "$database" ]; then
+        echo "The PostgreSQL credentials are missing." >&2
+        echo "Is the 'postgresql' feature enabled for this website?" >&2
+        exit 1
+      fi
 
       env_file="$HOME/stockroom.env"
 
@@ -71,15 +87,15 @@ commands:
         echo "export SECRET_KEY_BASE=\"$secret_key_base\""
         # "seeds=false" keeps db/seeds.rb out of the database: the demo
         # accounts of the seeds file have public passwords.
-        echo "export DATABASE_URL=\"postgresql://$USERNAME:$PGPASSWD@localhost:5432/$DATABASE?seeds=false\""
+        echo "export DATABASE_URL=\"postgresql://$username:$password@localhost:5432/$database?seeds=false\""
         echo "export RAILS_ENV=production"
         echo "export RACK_ENV=production"
         # DOM Cloud terminates TLS in NGINX and forwards the request with
         # "X-Forwarded-Proto: https".
         echo "export FORCE_SSL=true"
         echo "export ASSUME_SSL=true"
-        echo "export APP_HOST=\"$DOMAIN\""
-        echo "export APP_HOSTS=\"$DOMAIN\""
+        echo "export APP_HOST=\"$domain\""
+        echo "export APP_HOSTS=\"$domain\""
         echo "export RAILS_MAX_THREADS=5"
         echo "export RAILS_LOG_LEVEL=info"
         echo "export PATH=\"\$HOME/.rvm/rubies/default/bin:\$PATH\""
@@ -88,7 +104,7 @@ commands:
       chmod 0600 "$env_file"
       echo "wrote $env_file"
 
-  - bash domcloud_env.sh
+  - bash domcloud_env.sh "$USERNAME" "$PGPASSWD" "$DATABASE" "$DOMAIN"
 
   # The start script of the application.
   - filename: run.sh
