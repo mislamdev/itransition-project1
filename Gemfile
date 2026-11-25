@@ -23,7 +23,7 @@ gem "omniauth", "~> 2.1"
 gem "omniauth-google-oauth2"
 gem "omniauth-facebook"
 # Required for OmniAuth 2.0+ on POST /auth/:provider [https://github.com/omniauth/omniauth-rails_csrf_protection]
-gem "omniauth-rails_csrf_protection", "~> 1.0"
+gem "omniauth-rails_csrf_protection", "~> 2.0"
 
 # Markdown rendering for inventory descriptions and comments [https://github.com/gjtorikian/commonmarker]
 gem "commonmarker"
