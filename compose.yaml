@@ -1,0 +1,71 @@
+# Run Stockroom with Docker.
+#
+#   docker compose up --build
+#   open http://localhost:3000
+#
+# The application runs in the production image of the repository (the same
+# one that Render builds), the database is a PostgreSQL 16 container. The
+# schema is created by the entry point of the image, and the administrator
+# of the demo installation is created from ADMIN_EMAIL and ADMIN_PASSWORD.
+#
+# Stop everything (the data of the database stays):
+#
+#   docker compose down
+#
+# Stop everything and delete the data of the database:
+#
+#   docker compose down -v
+#
+# A database of the host is not needed. To look into the database:
+#
+#   docker compose exec db psql -U stockroom -d stockroom_db
+
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: stockroom
+      POSTGRES_PASSWORD: stockroom
+      POSTGRES_DB: stockroom_db
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U stockroom -d stockroom_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    # The port of the database is not published: the application reaches it
+    # over the network of the compose project.
+
+  web:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      RAILS_ENV: production
+      PORT: "3000"
+
+      DATABASE_URL: postgresql://stockroom:stockroom@db:5432/stockroom_db
+
+      # A development key. It signs the session cookies, so it has to stay
+      # the same over the restarts of the container.
+      SECRET_KEY_BASE: 3a1f7c9e5b2d8046f1c9e7a3b5d2046f8c1a9e7d3b5f2046c8a1e9d7b3f50246c
+
+      # There is no TLS in front of the application, so the redirect to
+      # HTTPS has to stay off.
+      FORCE_SSL: "false"
+      ASSUME_SSL: "false"
+      APP_HOST: localhost
+      APP_HOSTS: localhost
+
+      # The administrator of the demo installation.
+      ADMIN_EMAIL: admin@example.com
+      ADMIN_PASSWORD: administrator
+
+      RAILS_LOG_LEVEL: info
+    ports:
+      - "3000:3000"
+
+volumes:
+  db_data:

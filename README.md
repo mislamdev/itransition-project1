@@ -162,30 +162,30 @@ PostgreSQL stores generated `tsvector` columns for inventories and items with GI
 
 The frontend uses semantic HTML tables, Bootstrap 5, and a small custom CSS token theme. Table actions live in selection toolbars above tables; item rows link to item pages rather than containing permanent action-button clusters. Drag-and-drop features have keyboard move controls, and the layout includes a skip link, visible focus states, reduced-motion support, and responsive table containers.
 
-## Container deployment
+## Running with Docker
 
-Build and run the production image:
-
-```bash
-docker build -t stockroom .
-docker run --rm -p 3000:3000 \
-  -e DATABASE_URL="$DATABASE_URL" \
-  -e SECRET_KEY_BASE="$SECRET_KEY_BASE" \
-  stockroom
-```
-
-The entrypoint runs `db:prepare` before starting Puma: it waits for the
-database to accept connections, creates the schema from `db/structure.sql`
-when it is missing and runs the pending migrations afterwards. Supply
-`RAILS_MASTER_KEY` instead of `SECRET_KEY_BASE` when encrypted credentials are
-required.
-
-Append `?seeds=false` to the database URL to keep the demo accounts of
-`db/seeds.rb` out of a fresh database:
+The repository ships a `Dockerfile` (the production image) and a
+`compose.yaml` (the application plus a PostgreSQL 16 database):
 
 ```bash
-DATABASE_URL="postgres://user:password@host/database?seeds=false"
+docker compose up --build
 ```
+
+Open <http://localhost:3000> and sign in with `admin@example.com` /
+`administrator` — the entry point of the image creates the administrator and
+prepares the schema of the empty database.
+
+| Command | Effect |
+|---|---|
+| `docker compose up --build` | Build the image and start the application and the database |
+| `docker compose logs -f web` | The log of the application |
+| `docker compose exec db psql -U stockroom -d stockroom_db` | A shell in the database |
+| `docker compose down` | Stop everything, the data of the database stays |
+| `docker compose down -v` | Stop everything and delete the data of the database |
+
+The image is the same one that [Render](docs/deployment/render.md) builds:
+the gems and the assets are compiled while it is built, the entry point
+prepares the database and starts Puma on `0.0.0.0:$PORT`.
 
 ## Deployment on Cloud 66
 

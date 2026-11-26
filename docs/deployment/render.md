@@ -116,6 +116,9 @@ bundle exec rails "admin:create[admin@example.com,a-strong-password]"
 
 The application lives in `/rails` inside the image.
 
+> The same image runs on a workstation: `docker compose up --build` starts
+> the application and a PostgreSQL container (see the README).
+
 ## 5. The native Ruby runtime (alternative)
 
 Render can also build the repository with its own Ruby runtime. Then the
